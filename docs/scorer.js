@@ -1,7 +1,19 @@
 /**
- * scorer.js — In-browser ASAG Scoring Engine
- * Mirrors the Python pipeline: anchor_extraction.py + semantic_mapping.py + model_training.py
- * Works 100% offline, zero external model downloads.
+ * scorer.js — In-browser ASAG Scoring Engine  (Two-Stage)
+ *
+ * Stage 1 — Rule-Based (floor)
+ *   Scores by direct word matching: what fraction of the reference answer's
+ *   important content words appear in the student answer?
+ *   • Exact match  → 100% → full marks, always.
+ *   • This score is the guaranteed minimum the student can never score below.
+ *
+ * Stage 2 — Semantic / AI
+ *   Scores using TF-IDF cosine similarity, Jaccard, edit-distance, and
+ *   anchor-concept coverage — mirrors the Python Random-Forest pipeline.
+ *
+ * Final Score = max(stage1, stage2)
+ *   The AI score can be higher than the rule-based score (semantic bonus),
+ *   but it can NEVER be lower — rule-based acts as a safety floor.
  */
 
 // ─────────────────────────────────────────────────────────────
@@ -191,10 +203,55 @@ function computeFeatures(referenceAnswer, studentAnswer, numAnchors = 5) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 7. SCORE PREDICTION  (RF feature importances encoded as weights)
-// Importances derived from a typical Mohler-dataset RF run:
-//   feat_anchors_covered: 0.35, feat_avg_semantic: 0.30,
-//   feat_max_semantic: 0.18, feat_avg_jaccard: 0.10, feat_avg_edit: 0.07
+// 7A. STAGE 1 — RULE-BASED DIRECT WORD MATCH (Floor / Minimum)
+//
+// Logic:
+//   1. Exact string match  → 100% → full marks immediately.
+//   2. Otherwise: what % of the reference's content words (no stopwords)
+//      are present anywhere in the student answer?
+//   This is a recall-oriented score: did the student mention everything
+//   the teacher wrote?
+// ─────────────────────────────────────────────────────────────
+
+function ruleBasedScore(referenceAnswer, studentAnswer, maxScore = 5) {
+    // Guard: empty answers get zero
+    if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
+
+    // ── Exact match → full marks ─────────────────────────────
+    const refNorm = referenceAnswer.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const stuNorm = studentAnswer.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (refNorm === stuNorm) return maxScore;
+
+    // ── Word-level recall ────────────────────────────────────
+    // Content words in reference (the target the student must hit)
+    const refWords = tokenizeFiltered(referenceAnswer);
+    if (refWords.length === 0) return 0;
+
+    // All words (with stopwords) in the student's answer – broad match
+    const stuAllWords = new Set(tokenize(studentAnswer));
+
+    // Count how many reference content words appear in student answer
+    const matchedCount = refWords.filter(w => stuAllWords.has(w)).length;
+    const wordRecall = matchedCount / refWords.length;          // 0–1
+
+    // ── Phrase-level bonus ───────────────────────────────────
+    // Also check for whole unique bigrams / phrases from reference in student
+    // (e.g. "carbon dioxide" should count as a unit).
+    const refBigrams = ngramTokens(tokenizeFiltered(referenceAnswer), 2);
+    const stuText = stuNorm;
+    const bigramHits = refBigrams.filter(bg => stuText.includes(bg)).length;
+    const bigramBonus = refBigrams.length > 0
+        ? (bigramHits / refBigrams.length) * 0.15  // up to +15% boost
+        : 0;
+
+    const ruleRatio = Math.min(1, wordRecall + bigramBonus);
+    return ruleRatio * maxScore;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7B. STAGE 2 — SEMANTIC / AI SCORE
+// RF feature importances: anchors_covered 35%, avg_semantic 30%,
+// max_semantic 18%, avg_jaccard 10%, avg_edit 7%
 // ─────────────────────────────────────────────────────────────
 
 const WEIGHTS = {
@@ -205,7 +262,7 @@ const WEIGHTS = {
     feat_avg_edit: 0.07,
 };
 
-function predictScore(features, maxScore = 5) {
+function semanticScore(features, maxScore = 5) {
     const raw =
         WEIGHTS.feat_anchors_covered * features.feat_anchors_covered +
         WEIGHTS.feat_avg_semantic * features.feat_avg_semantic +
@@ -213,6 +270,18 @@ function predictScore(features, maxScore = 5) {
         WEIGHTS.feat_avg_jaccard * features.feat_avg_jaccard +
         WEIGHTS.feat_avg_edit * features.feat_avg_edit;
     return Math.max(0, Math.min(maxScore, raw * maxScore));
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7C. FINAL SCORE = max(stage1_rule, stage2_semantic)
+// The semantic AI score can only RAISE the bar, never lower it.
+// ─────────────────────────────────────────────────────────────
+
+function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
+    const stage1 = ruleBasedScore(referenceAnswer, studentAnswer, maxScore);
+    const stage2 = semanticScore(features, maxScore);
+    const final = Math.max(stage1, stage2);
+    return { stage1, stage2, final };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -224,7 +293,7 @@ function predictScore(features, maxScore = 5) {
 const BASELINE = 0.40;
 
 function shapValues(features, maxScore = 5) {
-    const scale = maxScore; // scale attribution to score units
+    const scale = maxScore;
     return {
         feat_avg_semantic: (features.feat_avg_semantic - BASELINE) * WEIGHTS.feat_avg_semantic * scale,
         feat_max_semantic: (features.feat_max_semantic - BASELINE) * WEIGHTS.feat_max_semantic * scale,
@@ -238,7 +307,8 @@ function shapValues(features, maxScore = 5) {
 // 9. PLAIN-ENGLISH EXPLANATION  (mirrors Python _generate_plain_english_explanation)
 // ─────────────────────────────────────────────────────────────
 
-function generateExplanation(score, features, shapVals, maxScore = 5) {
+function generateExplanation(scoreObj, features, shapVals, maxScore = 5) {
+    const score = scoreObj.final;
     const { feat_avg_semantic: avgSem, feat_max_semantic: maxSem,
         feat_anchors_covered: coverage, feat_avg_jaccard: jaccard,
         feat_avg_edit: editSim } = features;
@@ -323,15 +393,24 @@ function generateExplanation(score, features, shapVals, maxScore = 5) {
 // 10. TOP-LEVEL API — called by app.js
 // ─────────────────────────────────────────────────────────────
 
+/**
+ * gradeAnswer(ref, student, maxScore)
+ *
+ * Returns:
+ *   scoreObj  = { stage1 (rule-based), stage2 (semantic AI), final (max of both) }
+ *   features  = raw feature values
+ *   shap      = per-feature SHAP-style attributions
+ *   explanation = plain-English object { sections[], tips[] }
+ */
 function gradeAnswer(referenceAnswer, studentAnswer, maxScore = 5) {
     const features = computeFeatures(referenceAnswer, studentAnswer);
-    const score = predictScore(features, maxScore);
+    const scoreObj = predictScore(referenceAnswer, studentAnswer, features, maxScore);
     const shap = shapValues(features, maxScore);
-    const explanation = generateExplanation(score, features, shap, maxScore);
-    return { score, maxScore, features, shap, explanation };
+    const explanation = generateExplanation(scoreObj, features, shap, maxScore);
+    return { scoreObj, maxScore, features, shap, explanation };
 }
 
 // Export for use as module OR global (GitHub Pages = global)
 if (typeof module !== 'undefined') {
-    module.exports = { gradeAnswer, computeFeatures, predictScore, shapValues, generateExplanation };
+    module.exports = { gradeAnswer, ruleBasedScore, semanticScore, computeFeatures, shapValues, generateExplanation };
 }

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Explainable Summary Score — AI-Powered Short Answer Grader</title>
-  <meta name="description" content="Explainable, AI-powered short answer grading. Get your score, understand why you got it, and learn how to improve — all in plain English." />
+  <meta name="description"
+    content="Explainable, AI-powered short answer grading. Get your score, understand why you got it, and learn how to improve — all in plain English." />
 
   <!-- Fonts & Styles -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,424 +14,467 @@
   <link rel="stylesheet" href="style.css" />
 
   <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
 </head>
+
 <body>
 
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      NAVBAR
 ═══════════════════════════════════════════ -->
-<nav class="navbar" id="navbar">
-  <a class="navbar__logo" href="#">🧠 ESS</a>
-  <ul class="navbar__links">
-    <li><a href="#how-it-works">How It Works</a></li>
-    <li><a href="#demo">Live Demo</a></li>
-    <li><a href="#batch">Batch Grade</a></li>
-    <li><a href="#about">About</a></li>
-  </ul>
-  <div class="navbar__actions">
-    <a class="btn btn--ghost btn--sm" href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank" rel="noopener">
-      ⭐ GitHub
-    </a>
-    <button class="theme-toggle" id="theme-toggle" title="Toggle dark / light mode">☀️</button>
-  </div>
-</nav>
+  <nav class="navbar" id="navbar">
+    <a class="navbar__logo" href="#">🧠 ESS</a>
+    <ul class="navbar__links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#demo">Live Demo</a></li>
+      <li><a href="#batch">Batch Grade</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <div class="navbar__actions">
+      <a class="btn btn--ghost btn--sm" href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank"
+        rel="noopener">
+        ⭐ GitHub
+      </a>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle dark / light mode">☀️</button>
+    </div>
+  </nav>
 
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      HERO
 ═══════════════════════════════════════════ -->
-<section class="hero" id="hero">
-  <div class="hero__bg">
-    <div class="hero__grid"></div>
-  </div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+  <section class="hero" id="hero">
+    <div class="hero__bg">
+      <div class="hero__grid"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-  <div class="container">
-    <div class="hero__content">
-      <div class="hero__tag">
-        🔬 Research-grade · Open Source · Fully Explainable
-      </div>
-
-      <h1 class="hero__title">
-        AI Grading That<br/>
-        <span class="grad">Actually Explains Itself</span>
-      </h1>
-
-      <p class="hero__subtitle">
-        Upload your answer. Get a score. Understand <em>exactly</em> why — in plain English, not jargon.
-        Built on KeyBERT, Semantic Mapping, and SHAP explainability.
-      </p>
-
-      <div class="hero__cta">
-        <a href="#demo" class="btn btn--primary btn--lg">
-          🚀 Try Live Demo
-        </a>
-        <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" class="btn btn--ghost btn--lg" target="_blank" rel="noopener">
-          View Source
-        </a>
-      </div>
-
-      <div class="hero__stats">
-        <div class="hero__stat">
-          <div class="hero__stat-value">5</div>
-          <div class="hero__stat-label">Explainable Features</div>
+    <div class="container">
+      <div class="hero__content">
+        <div class="hero__tag">
+          🔬 Research-grade · Open Source · Fully Explainable
         </div>
-        <div class="hero__stat">
-          <div class="hero__stat-value">2,200+</div>
-          <div class="hero__stat-label">Mohler Dataset Rows</div>
+
+        <h1 class="hero__title">
+          AI Grading That<br />
+          <span class="grad">Actually Explains Itself</span>
+        </h1>
+
+        <p class="hero__subtitle">
+          Upload your answer. Get a score. Understand <em>exactly</em> why — in plain English, not jargon.
+          Built on KeyBERT, Semantic Mapping, and SHAP explainability.
+        </p>
+
+        <div class="hero__cta">
+          <a href="#demo" class="btn btn--primary btn--lg">
+            🚀 Try Live Demo
+          </a>
+          <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" class="btn btn--ghost btn--lg"
+            target="_blank" rel="noopener">
+            View Source
+          </a>
         </div>
-        <div class="hero__stat">
-          <div class="hero__stat-value">100%</div>
-          <div class="hero__stat-label">Runs In Your Browser</div>
-        </div>
-        <div class="hero__stat">
-          <div class="hero__stat-value">0</div>
-          <div class="hero__stat-label">Data Sent to Any Server</div>
+
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <div class="hero__stat-value">5</div>
+            <div class="hero__stat-label">Explainable Features</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-value">2,200+</div>
+            <div class="hero__stat-label">Mohler Dataset Rows</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-value">100%</div>
+            <div class="hero__stat-label">Runs In Your Browser</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-value">0</div>
+            <div class="hero__stat-label">Data Sent to Any Server</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      HOW IT WORKS
 ═══════════════════════════════════════════ -->
-<section class="section how-it-works" id="how-it-works">
-  <div class="container">
-    <div class="section-title appear">
-      <span class="badge">Pipeline</span>
-      <h2>How It Works</h2>
-      <p>Three stages transform a student's raw text into an explainable, defensible score.</p>
-    </div>
+  <section class="section how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Pipeline</span>
+        <h2>How It Works</h2>
+        <p>Three stages transform a student's raw text into an explainable, defensible score.</p>
+      </div>
 
-    <div class="pipeline appear">
-      <div class="pipeline-step">
-        <div class="pipeline-step__icon">
-          ⚓
-          <span class="pipeline-step__num">1</span>
+      <div class="pipeline appear">
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            ⚓
+            <span class="pipeline-step__num">1</span>
+          </div>
+          <h3>Anchor Extraction</h3>
+          <p>KeyBERT extracts the top 5 key concepts (anchors) from the reference answer using TF-IDF scored keyphrases
+            — unigrams, bigrams, and trigrams.</p>
         </div>
-        <h3>Anchor Extraction</h3>
-        <p>KeyBERT extracts the top 5 key concepts (anchors) from the reference answer using TF-IDF scored keyphrases — unigrams, bigrams, and trigrams.</p>
+
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            🗺️
+            <span class="pipeline-step__num">2</span>
+          </div>
+          <h3>Semantic Mapping</h3>
+          <p>The student's answer is compared against each anchor via semantic similarity (sentence embeddings), Jaccard
+            word overlap, and edit-distance phrasing match.</p>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            📊
+            <span class="pipeline-step__num">3</span>
+          </div>
+          <h3>Score + Explain</h3>
+          <p>A Random Forest model (trained on the Mohler dataset) predicts the score. SHAP values attribute each
+            feature's contribution so every point gained or lost is explained.</p>
+        </div>
       </div>
 
-      <div class="pipeline-step">
-        <div class="pipeline-step__icon">
-          🗺️
-          <span class="pipeline-step__num">2</span>
+      <!-- Feature detail cards -->
+      <div class="grid-3" style="margin-top:56px;">
+        <div class="card appear">
+          <div class="feature-card__icon">🎯</div>
+          <h3>Key Concept Coverage</h3>
+          <p>Measures what fraction of the anchor concepts from the ideal answer appear in your response. The single
+            most important factor.</p>
         </div>
-        <h3>Semantic Mapping</h3>
-        <p>The student's answer is compared against each anchor via semantic similarity (sentence embeddings), Jaccard word overlap, and edit-distance phrasing match.</p>
-      </div>
-
-      <div class="pipeline-step">
-        <div class="pipeline-step__icon">
-          📊
-          <span class="pipeline-step__num">3</span>
+        <div class="card appear">
+          <div class="feature-card__icon">🧬</div>
+          <h3>Semantic Similarity</h3>
+          <p>Captures meaning beyond exact words — your answer can use synonyms and still score well if the underlying
+            idea matches.</p>
         </div>
-        <h3>Score + Explain</h3>
-        <p>A Random Forest model (trained on the Mohler dataset) predicts the score. SHAP values attribute each feature's contribution so every point gained or lost is explained.</p>
+        <div class="card appear">
+          <div class="feature-card__icon">📝</div>
+          <h3>Vocabulary Overlap</h3>
+          <p>Rewards using the correct domain-specific terminology from the model answer, which is critical in technical
+            subjects.</p>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- Feature detail cards -->
-    <div class="grid-3" style="margin-top:56px;">
-      <div class="card appear">
-        <div class="feature-card__icon">🎯</div>
-        <h3>Key Concept Coverage</h3>
-        <p>Measures what fraction of the anchor concepts from the ideal answer appear in your response. The single most important factor.</p>
-      </div>
-      <div class="card appear">
-        <div class="feature-card__icon">🧬</div>
-        <h3>Semantic Similarity</h3>
-        <p>Captures meaning beyond exact words — your answer can use synonyms and still score well if the underlying idea matches.</p>
-      </div>
-      <div class="card appear">
-        <div class="feature-card__icon">📝</div>
-        <h3>Vocabulary Overlap</h3>
-        <p>Rewards using the correct domain-specific terminology from the model answer, which is critical in technical subjects.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      LIVE DEMO
 ═══════════════════════════════════════════ -->
-<section class="section demo" id="demo">
-  <div class="container">
-    <div class="section-title appear">
-      <span class="badge">Live Demo</span>
-      <h2>Grade Any Answer Instantly</h2>
-      <p>Paste a reference answer and a student response — get a full explainable score in seconds.</p>
-    </div>
+  <section class="section demo" id="demo">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Live Demo</span>
+        <h2>Grade Any Answer Instantly</h2>
+        <p>Paste a reference answer and a student response — get a full explainable score in seconds.</p>
+      </div>
 
-    <div class="demo__layout">
-      <!-- Input Form -->
-      <div class="card appear" style="align-self:start">
-        <h3 style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
-          ✍️ Enter Answers
-          <button class="btn btn--ghost btn--sm" id="try-sample" style="margin-left:auto">Try Sample</button>
-        </h3>
+      <div class="demo__layout">
+        <!-- Input Form -->
+        <div class="card appear" style="align-self:start">
+          <h3 style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+            ✍️ Enter Answers
+            <button class="btn btn--ghost btn--sm" id="try-sample" style="margin-left:auto">Try Sample</button>
+          </h3>
 
-        <form id="demo-form">
-          <div class="form__group">
-            <label class="form__label" for="ref-answer">Reference / Ideal Answer</label>
-            <textarea class="form__textarea" id="ref-answer" rows="5"
-              placeholder="Paste the model answer or desired answer here…"
-              required></textarea>
-          </div>
-
-          <div class="form__group">
-            <label class="form__label" for="stu-answer">Student Answer</label>
-            <textarea class="form__textarea" id="stu-answer" rows="5"
-              placeholder="Paste the student's response here…"
-              required></textarea>
-          </div>
-
-          <div class="form__row">
+          <form id="demo-form">
             <div class="form__group">
-              <label class="form__label" for="max-score">Max Score</label>
-              <input class="form__input" id="max-score" type="number" value="5" min="1" max="100" step="0.5" />
+              <label class="form__label" for="ref-answer">Reference / Ideal Answer</label>
+              <textarea class="form__textarea" id="ref-answer" rows="5"
+                placeholder="Paste the model answer or desired answer here…" required></textarea>
             </div>
-          </div>
 
-          <button type="submit" class="btn btn--primary" style="width:100%">
-            ⚡ Compute Score &amp; Explanation
-          </button>
-        </form>
-      </div>
+            <div class="form__group">
+              <label class="form__label" for="stu-answer">Student Answer</label>
+              <textarea class="form__textarea" id="stu-answer" rows="5" placeholder="Paste the student's response here…"
+                required></textarea>
+            </div>
 
-      <!-- Results Panel -->
-      <div>
-        <!-- Spinner while computing -->
-        <div class="spinner" id="spinner" style="margin:60px auto;"></div>
+            <div class="form__row">
+              <div class="form__group">
+                <label class="form__label" for="max-score">Max Score</label>
+                <input class="form__input" id="max-score" type="number" value="5" min="1" max="100" step="0.5" />
+              </div>
+            </div>
 
-        <!-- Results -->
-        <div class="result-panel" id="result-panel">
+            <button type="submit" class="btn btn--primary" style="width:100%">
+              ⚡ Compute Score &amp; Explanation
+            </button>
+          </form>
+        </div>
 
-          <!-- Score gauge -->
-          <div class="score-display" id="score-display">
-            <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:4px;">
-              <span class="score-display__value" id="score-value">—</span>
-              <span style="font-size:1.4rem;color:var(--text-dim);font-weight:700;" id="score-max">/ 5</span>
-            </div>
-            <div class="score-display__label">Predicted Score</div>
-            <div class="score-bar">
-              <div class="score-bar__fill" id="score-bar-fill"></div>
-            </div>
-          </div>
+        <!-- Results Panel -->
+        <div>
+          <!-- Spinner while computing -->
+          <div class="spinner" id="spinner" style="margin:60px auto;"></div>
 
-          <!-- Anchors -->
-          <div class="card appear anchors-display" style="margin-bottom:16px;">
-            <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);margin-bottom:10px;">
-              🔑 Extracted Key Concepts (Anchors)
-            </div>
-            <div id="anchors-wrap" style="line-height:2.2;"></div>
-          </div>
+          <!-- Results -->
+          <div class="result-panel" id="result-panel">
 
-          <!-- Part 1: Plain English -->
-          <div class="explanation-card appear">
-            <div class="explanation-card__header">
-              <span style="font-size:1.2rem">📝</span>
-              <h3>What This Score Means</h3>
-              <span class="part-badge">Part 1 · Plain English</span>
+            <!-- Score gauge -->
+            <div class="score-display" id="score-display">
+              <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:4px;">
+                <span class="score-display__value" id="score-value">—</span>
+                <span style="font-size:1.4rem;color:var(--text-dim);font-weight:700;" id="score-max">/ 5</span>
+              </div>
+              <div class="score-display__label">Predicted Score</div>
+              <div class="score-bar">
+                <div class="score-bar__fill" id="score-bar-fill"></div>
+              </div>
+              <!-- Two-stage breakdown rendered by app.js -->
+              <div id="stage-breakdown"></div>
             </div>
-            <div class="explanation-card__body" id="explanation-body">
-              <!-- Rendered by app.js -->
-            </div>
-          </div>
 
-          <!-- Part 2: SHAP -->
-          <div class="shap-card appear">
-            <div class="shap-card__header">
-              <span style="font-size:1.2rem">📊</span>
-              <h3>Feature Attributions</h3>
-              <span class="part-badge" style="background:rgba(0,212,255,0.1);color:var(--accent2);border-color:rgba(0,212,255,0.2);">
-                Part 2 · SHAP Values
-              </span>
+            <!-- Anchors -->
+            <div class="card appear anchors-display" style="margin-bottom:16px;">
+              <div
+                style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);margin-bottom:10px;">
+                🔑 Extracted Key Concepts (Anchors)
+              </div>
+              <div id="anchors-wrap" style="line-height:2.2;"></div>
             </div>
-            <div class="shap-card__body" id="shap-body">
-              <!-- Rendered by app.js -->
-            </div>
-            <div style="padding:12px 24px;font-size:0.78rem;color:var(--text-dim);border-top:1px solid var(--border-soft);">
-              ▲ Green bars raise your score above the average student baseline &nbsp;·&nbsp;
-              ▼ Red bars lower it. Hover rows for details.
-            </div>
-          </div>
 
-        </div><!-- /result-panel -->
+            <!-- Part 1: Plain English -->
+            <div class="explanation-card appear">
+              <div class="explanation-card__header">
+                <span style="font-size:1.2rem">📝</span>
+                <h3>What This Score Means</h3>
+                <span class="part-badge">Part 1 · Plain English</span>
+              </div>
+              <div class="explanation-card__body" id="explanation-body">
+                <!-- Rendered by app.js -->
+              </div>
+            </div>
+
+            <!-- Part 2: SHAP -->
+            <div class="shap-card appear">
+              <div class="shap-card__header">
+                <span style="font-size:1.2rem">📊</span>
+                <h3>Feature Attributions</h3>
+                <span class="part-badge"
+                  style="background:rgba(0,212,255,0.1);color:var(--accent2);border-color:rgba(0,212,255,0.2);">
+                  Part 2 · SHAP Values
+                </span>
+              </div>
+              <div class="shap-card__body" id="shap-body">
+                <!-- Rendered by app.js -->
+              </div>
+              <div
+                style="padding:12px 24px;font-size:0.78rem;color:var(--text-dim);border-top:1px solid var(--border-soft);">
+                ▲ Green bars raise your score above the average student baseline &nbsp;·&nbsp;
+                ▼ Red bars lower it. Hover rows for details.
+              </div>
+            </div>
+
+          </div><!-- /result-panel -->
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      BATCH GRADING
 ═══════════════════════════════════════════ -->
-<section class="section batch" id="batch">
-  <div class="container">
-    <div class="section-title appear">
-      <span class="badge">Batch Mode</span>
-      <h2>Grade an Entire Class at Once</h2>
-      <p>Upload a CSV with reference and student answers — get scores and explanations for every row.</p>
+  <section class="section batch" id="batch">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Batch Mode</span>
+        <h2>Grade an Entire Class at Once</h2>
+        <p>Upload a CSV with reference and student answers — get scores and explanations for every row.</p>
+      </div>
+
+      <div class="csv-hint appear">
+        Required CSV columns (flexible name matching):
+        <code>question</code> &nbsp;
+        <code>desired_answer</code> (or <em>reference_answer</em> / <em>ideal_answer</em>) &nbsp;
+        <code>student_answer</code> (or <em>response</em>)
+        — matches the Mohler dataset format directly.
+      </div>
+
+      <div class="upload-zone appear" id="upload-zone">
+        <div class="upload-zone__icon">📂</div>
+        <h3>Drop your CSV here, or click to browse</h3>
+        <p>Supports the Mohler dataset format out-of-the-box.</p>
+        <br />
+        <button class="btn btn--primary btn--sm"
+          onclick="event.stopPropagation(); document.getElementById('batch-file-input').click()">
+          Choose File
+        </button>
+        <input type="file" id="batch-file-input" accept=".csv" />
+      </div>
+
+      <div id="batch-progress" class="hidden" style="text-align:center;padding:20px;color:var(--text-muted);"></div>
+
+      <div id="batch-results" class="hidden">
+        <div id="batch-table-wrap"></div>
+      </div>
     </div>
+  </section>
 
-    <div class="csv-hint appear">
-      Required CSV columns (flexible name matching):
-      <code>question</code> &nbsp;
-      <code>desired_answer</code> (or <em>reference_answer</em> / <em>ideal_answer</em>) &nbsp;
-      <code>student_answer</code> (or <em>response</em>)
-      — matches the Mohler dataset format directly.
-    </div>
-
-    <div class="upload-zone appear" id="upload-zone">
-      <div class="upload-zone__icon">📂</div>
-      <h3>Drop your CSV here, or click to browse</h3>
-      <p>Supports the Mohler dataset format out-of-the-box.</p>
-      <br/>
-      <button class="btn btn--primary btn--sm" onclick="event.stopPropagation(); document.getElementById('batch-file-input').click()">
-        Choose File
-      </button>
-      <input type="file" id="batch-file-input" accept=".csv" />
-    </div>
-
-    <div id="batch-progress" class="hidden" style="text-align:center;padding:20px;color:var(--text-muted);"></div>
-
-    <div id="batch-results" class="hidden">
-      <div id="batch-table-wrap"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      ABOUT
 ═══════════════════════════════════════════ -->
-<section class="section about" id="about">
-  <div class="container">
-    <div class="section-title appear">
-      <span class="badge">About</span>
-      <h2>The Research Behind It</h2>
-    </div>
-
-    <div class="grid-2">
-      <div class="card appear">
-        <h3 style="margin-bottom:14px;">🎓 Project Background</h3>
-        <p style="margin-bottom:14px;">
-          This system is built on the <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark corpus of
-          student responses to computer science questions, each graded on a 0–5 scale by human annotators.
-        </p>
-        <p style="margin-bottom:14px;">
-          The pipeline addresses the twin problems of <em>length-bias noise</em> and <em>black-box scoring</em> by
-          anchoring the score to specific, extractable concepts rather than surface-level text statistics.
-        </p>
-        <p>
-          SHAP (SHapley Additive exPlanations) values are used to decompose the Random Forest prediction into
-          per-feature contributions, ensuring every point gained or lost can be traced back to a concrete
-          aspect of the student's answer.
-        </p>
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">About</span>
+        <h2>The Research Behind It</h2>
       </div>
 
-      <div class="card appear">
-        <h3 style="margin-bottom:14px;">🛠 Tech Stack</h3>
-        <div class="tech-stack">
-          <span class="tech-tag">Python 3.12</span>
-          <span class="tech-tag">scikit-learn RF</span>
-          <span class="tech-tag">KeyBERT</span>
-          <span class="tech-tag">sentence-transformers</span>
-          <span class="tech-tag">SHAP</span>
-          <span class="tech-tag">all-MiniLM-L6-v2</span>
-          <span class="tech-tag">pandas / numpy</span>
-          <span class="tech-tag">HTML5 / CSS3</span>
-          <span class="tech-tag">Vanilla JS</span>
-          <span class="tech-tag">PapaParse</span>
-          <span class="tech-tag">GitHub Pages</span>
-          <span class="tech-tag">Levenshtein</span>
-          <span class="tech-tag">TF-IDF Cosine</span>
+      <div class="grid-2">
+        <div class="card appear">
+          <h3 style="margin-bottom:14px;">🎓 Project Background</h3>
+          <p style="margin-bottom:14px;">
+            This system is built on the <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark corpus of
+            student responses to computer science questions, each graded on a 0–5 scale by human annotators.
+          </p>
+          <p style="margin-bottom:14px;">
+            The pipeline addresses the twin problems of <em>length-bias noise</em> and <em>black-box scoring</em> by
+            anchoring the score to specific, extractable concepts rather than surface-level text statistics.
+          </p>
+          <p>
+            SHAP (SHapley Additive exPlanations) values are used to decompose the Random Forest prediction into
+            per-feature contributions, ensuring every point gained or lost can be traced back to a concrete
+            aspect of the student's answer.
+          </p>
         </div>
 
-        <div class="divider"></div>
+        <div class="card appear">
+          <h3 style="margin-bottom:14px;">🛠 Tech Stack</h3>
+          <div class="tech-stack">
+            <span class="tech-tag">Python 3.12</span>
+            <span class="tech-tag">scikit-learn RF</span>
+            <span class="tech-tag">KeyBERT</span>
+            <span class="tech-tag">sentence-transformers</span>
+            <span class="tech-tag">SHAP</span>
+            <span class="tech-tag">all-MiniLM-L6-v2</span>
+            <span class="tech-tag">pandas / numpy</span>
+            <span class="tech-tag">HTML5 / CSS3</span>
+            <span class="tech-tag">Vanilla JS</span>
+            <span class="tech-tag">PapaParse</span>
+            <span class="tech-tag">GitHub Pages</span>
+            <span class="tech-tag">Levenshtein</span>
+            <span class="tech-tag">TF-IDF Cosine</span>
+          </div>
 
-        <h3 style="margin-bottom:14px;">📄 References</h3>
-        <ul style="padding-left:18px; font-size:0.88rem; color:var(--text-muted);">
-          <li style="margin-bottom:8px;">Mohler et al. (2011). <em>Learning to grade short answer questions using semantic similarity measures and dependency graph alignments.</em> ACL.</li>
-          <li style="margin-bottom:8px;">Saha et al. (2023). <em>System for short-answer grading using generative models.</em> BEA Workshop, ACL 2023.</li>
-          <li>Lundberg &amp; Lee (2017). <em>A unified approach to interpreting model predictions.</em> NeurIPS.</li>
-        </ul>
-      </div>
+          <div class="divider"></div>
 
-      <div class="card appear" style="grid-column:1/-1;">
-        <h3 style="margin-bottom:14px;">📊 Feature Descriptions</h3>
-        <div style="overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
-            <thead>
-              <tr>
-                <th style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">Feature</th>
-                <th style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">What It Measures</th>
-                <th style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">RF Weight</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);"><code>feat_anchors_covered</code></td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Fraction of key-concept anchors from the ideal answer that the student addressed (threshold 0.35 cosine)</td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">35%</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);"><code>feat_avg_semantic</code></td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Average cosine similarity between the student answer embedding and each anchor embedding</td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">30%</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);"><code>feat_max_semantic</code></td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Best (maximum) cosine similarity score across all anchor comparisons — captures the student's strongest matching phrase</td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">18%</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);"><code>feat_avg_jaccard</code></td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Average Jaccard word-set overlap between the student answer and each anchor — rewards correct terminology</td>
-                <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">10%</td>
-              </tr>
-              <tr>
-                <td style="padding:10px 14px;"><code>feat_avg_edit</code></td>
-                <td style="padding:10px 14px;color:var(--text-muted);">Average normalised Levenshtein similarity — captures phrasing closeness beyond word-level comparison</td>
-                <td style="padding:10px 14px;color:var(--primary);font-weight:700;">7%</td>
-              </tr>
-            </tbody>
-          </table>
+          <h3 style="margin-bottom:14px;">📄 References</h3>
+          <ul style="padding-left:18px; font-size:0.88rem; color:var(--text-muted);">
+            <li style="margin-bottom:8px;">Mohler et al. (2011). <em>Learning to grade short answer questions using
+                semantic similarity measures and dependency graph alignments.</em> ACL.</li>
+            <li style="margin-bottom:8px;">Saha et al. (2023). <em>System for short-answer grading using generative
+                models.</em> BEA Workshop, ACL 2023.</li>
+            <li>Lundberg &amp; Lee (2017). <em>A unified approach to interpreting model predictions.</em> NeurIPS.</li>
+          </ul>
+        </div>
+
+        <div class="card appear" style="grid-column:1/-1;">
+          <h3 style="margin-bottom:14px;">📊 Feature Descriptions</h3>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+              <thead>
+                <tr>
+                  <th
+                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                    Feature</th>
+                  <th
+                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                    What It Measures</th>
+                  <th
+                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
+                    RF Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
+                    <code>feat_anchors_covered</code></td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
+                    Fraction of key-concept anchors from the ideal answer that the student addressed (threshold 0.35
+                    cosine)</td>
+                  <td
+                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
+                    35%</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
+                    <code>feat_avg_semantic</code></td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
+                    Average cosine similarity between the student answer embedding and each anchor embedding</td>
+                  <td
+                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
+                    30%</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
+                    <code>feat_max_semantic</code></td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Best
+                    (maximum) cosine similarity score across all anchor comparisons — captures the student's strongest
+                    matching phrase</td>
+                  <td
+                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
+                    18%</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
+                    <code>feat_avg_jaccard</code></td>
+                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
+                    Average Jaccard word-set overlap between the student answer and each anchor — rewards correct
+                    terminology</td>
+                  <td
+                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
+                    10%</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;"><code>feat_avg_edit</code></td>
+                  <td style="padding:10px 14px;color:var(--text-muted);">Average normalised Levenshtein similarity —
+                    captures phrasing closeness beyond word-level comparison</td>
+                  <td style="padding:10px 14px;color:var(--primary);font-weight:700;">7%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════════ -->
-<footer class="footer">
-  <div class="container">
-    <p>
-      Built with ❤️ by
-      <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener">ManikeshK1</a>
-      &nbsp;·&nbsp;
-      <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank" rel="noopener">GitHub</a>
-      &nbsp;·&nbsp;
-      All scoring runs locally in your browser — no data is sent anywhere.
-    </p>
-  </div>
-</footer>
+  <footer class="footer">
+    <div class="container">
+      <p>
+        Built with ❤️ by
+        <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener">ManikeshK1</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        All scoring runs locally in your browser — no data is sent anywhere.
+      </p>
+    </div>
+  </footer>
 
-<!-- ── Toast notification ─────────────────── -->
-<div class="toast" id="toast"></div>
+  <!-- ── Toast notification ─────────────────── -->
+  <div class="toast" id="toast"></div>
 
-<!-- ── Scripts (CDN first, then ours) ────── -->
-<!-- PapaParse: CSV parsing -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<!-- Our scoring engine (must load before app.js) -->
-<script src="scorer.js"></script>
-<!-- Our UI controller -->
-<script src="app.js"></script>
+  <!-- ── Scripts (CDN first, then ours) ────── -->
+  <!-- PapaParse: CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Our scoring engine (must load before app.js) -->
+  <script src="scorer.js"></script>
+  <!-- Our UI controller -->
+  <script src="app.js"></script>
 
 </body>
+
 </html>

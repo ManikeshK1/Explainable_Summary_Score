@@ -24,13 +24,12 @@ themeToggle.addEventListener('click', () => {
     applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 });
 
-// Apply saved or OS theme
 const savedTheme = localStorage.getItem(THEME_KEY) ||
     (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 applyTheme(savedTheme);
 
 // ─────────────────────────────────────────
-// Navbar: add .scrolled class on scroll
+// Navbar scroll class
 // ─────────────────────────────────────────
 
 const navbar = document.getElementById('navbar');
@@ -39,35 +38,35 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ─────────────────────────────────────────
-// Scroll-reveal on appear elements
+// Scroll-reveal
 // ─────────────────────────────────────────
 
 const appearEls = document.querySelectorAll('.appear');
 const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); } });
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
 }, { threshold: 0.1 });
 appearEls.forEach(el => observer.observe(el));
 
 // ─────────────────────────────────────────
-// Toast notification
+// Toast
 // ─────────────────────────────────────────
 
 function showToast(msg, type = 'success') {
     const toast = document.getElementById('toast');
     toast.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
     toast.className = `toast toast--${type} show`;
-    setTimeout(() => { toast.classList.remove('show'); }, 3500);
+    setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
 // ─────────────────────────────────────────
-// Smooth scroll for nav links
+// Smooth scroll nav links
 // ─────────────────────────────────────────
 
 document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
         e.preventDefault();
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 });
 
@@ -76,44 +75,74 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ─────────────────────────────────────────
 
 function scoreColor(score, maxScore) {
-    const pct = score / maxScore;
-    if (pct >= 0.70) return '#4ade80';
-    if (pct >= 0.40) return '#fbbf24';
+    const p = score / maxScore;
+    if (p >= 0.70) return '#4ade80';
+    if (p >= 0.40) return '#fbbf24';
     return '#f87171';
 }
 
 function scoreColorClass(score, maxScore) {
-    const pct = score / maxScore;
-    if (pct >= 0.70) return 'score-chip--high';
-    if (pct >= 0.40) return 'score-chip--mid';
+    const p = score / maxScore;
+    if (p >= 0.70) return 'score-chip--high';
+    if (p >= 0.40) return 'score-chip--mid';
     return 'score-chip--low';
 }
 
 // ─────────────────────────────────────────
-// RENDERING HELPERS
+// RENDER — Score Display (two-stage)
 // ─────────────────────────────────────────
 
-function renderScoreDisplay(score, maxScore) {
+function renderScoreDisplay(scoreObj, maxScore) {
+    const { stage1, stage2, final } = scoreObj;
     const el = document.getElementById('score-display');
-    const color = scoreColor(score, maxScore);
-    const pct = score / maxScore;
+    const color = scoreColor(final, maxScore);
+    const pct = final / maxScore;
 
-    el.querySelector('#score-value').textContent = score.toFixed(2);
+    el.querySelector('#score-value').textContent = final.toFixed(2);
     el.querySelector('#score-value').style.color = color;
     el.querySelector('#score-max').textContent = `/ ${maxScore.toFixed(1)}`;
 
     const fill = el.querySelector('#score-bar-fill');
-    fill.style.background = `linear-gradient(90deg, ${color}, ${color}aa)`;
+    fill.style.background = `linear-gradient(90deg, ${color}, ${color}99)`;
     fill.style.transform = 'scaleX(0)';
     fill.classList.remove('animate');
-    // Trigger animation
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            fill.style.transform = `scaleX(${pct})`;
-            fill.classList.add('animate');
-        });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        fill.style.transform = `scaleX(${pct})`;
+        fill.classList.add('animate');
+    }));
+
+    // ── Stage breakdown panel ──
+    const breakdown = document.getElementById('stage-breakdown');
+    const winner = stage1 >= stage2 ? 'rule' : 'ai';
+
+    breakdown.innerHTML = `
+      <div class="stage-grid">
+        <div class="stage-item ${winner === 'rule' ? 'stage-item--winner' : ''}">
+          <div class="stage-item__icon">⚖️</div>
+          <div class="stage-item__label">Stage 1 · Rule-Based</div>
+          <div class="stage-item__score" style="color:#fbbf24">${stage1.toFixed(2)}</div>
+          <div class="stage-item__sub">Direct word match</div>
+          ${winner === 'rule' ? '<div class="stage-winner-badge">🏆 Determines Final</div>' : ''}
+        </div>
+        <div class="stage-vs">MAX</div>
+        <div class="stage-item ${winner === 'ai' ? 'stage-item--winner' : ''}">
+          <div class="stage-item__icon">🤖</div>
+          <div class="stage-item__label">Stage 2 · Semantic AI</div>
+          <div class="stage-item__score" style="color:#38bdf8">${stage2.toFixed(2)}</div>
+          <div class="stage-item__sub">Meaning + concept coverage</div>
+          ${winner === 'ai' ? '<div class="stage-winner-badge">🏆 Determines Final</div>' : ''}
+        </div>
+      </div>
+      <div class="stage-final-note">
+        Final score = <strong>max(${stage1.toFixed(2)}, ${stage2.toFixed(2)}) = ${final.toFixed(2)}</strong>
+        — the AI score can only <em>raise</em> the rule-based floor, never lower it.
+      </div>
+    `;
 }
+
+// ─────────────────────────────────────────
+// RENDER — Plain English Explanation
+// ─────────────────────────────────────────
 
 function renderExplanation(explanation) {
     const body = document.getElementById('explanation-body');
@@ -123,9 +152,9 @@ function renderExplanation(explanation) {
         const div = document.createElement('div');
         div.className = 'explanation-section' + (s.sub ? ' explanation-section--sub' : '');
         div.innerHTML = `
-      <span class="explanation-section__icon">${s.icon}</span>
-      <span class="explanation-section__text">${s.text}</span>
-    `;
+            <span class="explanation-section__icon">${s.icon}</span>
+            <span class="explanation-section__text">${s.text}</span>
+        `;
         body.appendChild(div);
     });
 
@@ -133,17 +162,21 @@ function renderExplanation(explanation) {
         const box = document.createElement('div');
         box.className = 'tips-box';
         box.innerHTML = `
-      <div class="tips-box__title">💡 How to Improve</div>
-      <ul>${explanation.tips.map(t => `<li>${t}</li>`).join('')}</ul>
-    `;
+            <div class="tips-box__title">💡 How to Improve</div>
+            <ul>${explanation.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+        `;
         body.appendChild(box);
     }
 }
 
+// ─────────────────────────────────────────
+// RENDER — SHAP Chart
+// ─────────────────────────────────────────
+
 function renderShap(shap, maxScore) {
     const body = document.getElementById('shap-body');
     const maxAbs = Math.max(0.001, ...Object.values(shap).map(Math.abs));
-    const halfW = 50; // 50% = mid-point in the bar
+    const halfW = 50;
 
     const labels = {
         feat_avg_semantic: 'Avg. Semantic Match',
@@ -171,22 +204,25 @@ function renderShap(shap, maxScore) {
         const color = isPos ? '#4ade80' : '#f87171';
 
         return `
-      <div class="shap-row" data-tooltip="${tooltips[key] || ''}">
-        <span class="shap-row__label">${labels[key] || key}</span>
-        <div class="shap-row__bar-wrap">
-          <div class="shap-row__mid"></div>
-          <div class="shap-row__fill ${barCls}"
-               style="left:${left}%;width:${width}%"></div>
-        </div>
-        <span class="shap-row__value" style="color:${color}">${valLabel}</span>
-      </div>
-    `;
+          <div class="shap-row" data-tooltip="${tooltips[key] || ''}">
+            <span class="shap-row__label">${labels[key] || key}</span>
+            <div class="shap-row__bar-wrap">
+              <div class="shap-row__mid"></div>
+              <div class="shap-row__fill ${barCls}" style="left:${left}%;width:${width}%"></div>
+            </div>
+            <span class="shap-row__value" style="color:${color}">${valLabel}</span>
+          </div>
+        `;
     }).join('');
 }
 
+// ─────────────────────────────────────────
+// RENDER — Anchors
+// ─────────────────────────────────────────
+
 function renderAnchors(anchors) {
     const wrap = document.getElementById('anchors-wrap');
-    if (!anchors || anchors.length === 0) {
+    if (!anchors || !anchors.length) {
         wrap.innerHTML = '<span class="anchor-tag">No anchors extracted</span>';
         return;
     }
@@ -194,7 +230,7 @@ function renderAnchors(anchors) {
 }
 
 // ─────────────────────────────────────────
-// DEMO FORM — SINGLE ANSWER SCORING
+// DEMO FORM — Single answer grading
 // ─────────────────────────────────────────
 
 const demoForm = document.getElementById('demo-form');
@@ -213,17 +249,15 @@ demoForm.addEventListener('submit', e => {
         return;
     }
 
-    // Show spinner
     spinner.classList.add('active');
     resultPanel.classList.remove('visible');
 
-    // Scoring is synchronous but we setTimeout to let UI update
     setTimeout(() => {
         try {
             const result = gradeAnswer(ref, stu, maxSc);
-            const { score, features, shap, explanation } = result;
+            const { scoreObj, features, shap, explanation } = result;
 
-            renderScoreDisplay(score, maxSc);
+            renderScoreDisplay(scoreObj, maxSc);
             renderExplanation(explanation);
             renderShap(shap, maxSc);
             renderAnchors(features.anchors);
@@ -249,7 +283,6 @@ const batchResults = document.getElementById('batch-results');
 const batchTableWrap = document.getElementById('batch-table-wrap');
 const batchProgress = document.getElementById('batch-progress');
 
-// Drag-and-drop support
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
 uploadZone.addEventListener('drop', e => {
@@ -281,7 +314,6 @@ function processCsvFile(file) {
             const rows = results.data;
             const headers = results.meta.fields || [];
 
-            // Auto-detect column names (flexible matching)
             const colRef = headers.find(h => /ref|desired|model|ideal|answer.*ref/i.test(h)) || headers[1];
             const colStu = headers.find(h => /student|stu|response|answer.*stu/i.test(h) && h !== colRef) || headers[2];
             const colQ = headers.find(h => /question|q$/i.test(h)) || headers[0];
@@ -296,7 +328,6 @@ function processCsvFile(file) {
             let scored = [];
             let processed = 0;
 
-            // Score in micro-batches to keep UI responsive
             function scoreChunk(start) {
                 const end = Math.min(start + 10, rows.length);
                 for (let i = start; i < end; i++) {
@@ -308,9 +339,10 @@ function processCsvFile(file) {
                     const res = gradeAnswer(ref, stu, maxScoreDefault);
                     scored.push({
                         question: (row[colQ] || '').slice(0, 100),
-                        reference: ref.slice(0, 120),
                         student: stu.slice(0, 120),
-                        score: res.score,
+                        score: res.scoreObj.final,     // two-stage final
+                        stage1: res.scoreObj.stage1,
+                        stage2: res.scoreObj.stage2,
                         maxScore: maxScoreDefault,
                         coverage: res.features.feat_anchors_covered,
                         semantic: res.features.feat_avg_semantic,
@@ -320,11 +352,8 @@ function processCsvFile(file) {
 
                 batchProgress.textContent = `⏳ Scoring… ${processed} / ${rows.length}`;
 
-                if (end < rows.length) {
-                    setTimeout(() => scoreChunk(end), 10);
-                } else {
-                    renderBatchTable(scored);
-                }
+                if (end < rows.length) setTimeout(() => scoreChunk(end), 10);
+                else renderBatchTable(scored);
             }
 
             scoreChunk(0);
@@ -358,52 +387,50 @@ function renderTable(col, asc) {
     const cols = [
         { key: 'question', label: 'Question' },
         { key: 'student', label: 'Student Answer' },
-        { key: 'score', label: 'Score ↕' },
-        { key: 'coverage', label: 'Concepts Covered' },
-        { key: 'semantic', label: 'Semantic Match' },
+        { key: 'score', label: 'Final Score ↕' },
+        { key: 'stage1', label: 'Rule-Based' },
+        { key: 'stage2', label: 'AI Score' },
+        { key: 'coverage', label: 'Concepts %' },
     ];
 
     batchTableWrap.innerHTML = `
-    <div class="batch-table-wrap">
-      <table class="batch-table" id="batch-tbl">
-        <thead>
-          <tr>
+      <div class="batch-table-wrap">
+        <table class="batch-table" id="batch-tbl">
+          <thead><tr>
             ${cols.map(c => `
               <th class="${c.key === col ? 'sorted' : ''}" data-col="${c.key}">
                 ${c.label}
                 <span class="sort-icon">${c.key === col ? (asc ? '↑' : '↓') : '↕'}</span>
               </th>
             `).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${sorted.map(row => {
+          </tr></thead>
+          <tbody>
+            ${sorted.map(row => {
         const chipClass = scoreColorClass(row.score, row.maxScore);
         const barPct = Math.round((row.score / row.maxScore) * 100);
         const covPct = Math.round(row.coverage * 100);
-        const semPct = Math.round(row.semantic * 100);
         return `
-              <tr>
-                <td style="max-width:180px; font-size:0.82rem">${row.question || '—'}</td>
-                <td style="max-width:260px">${row.student}</td>
-                <td>
-                  <span class="score-chip ${chipClass}">${row.score.toFixed(2)} / ${row.maxScore}</span>
-                  <span class="mini-bar"><span class="mini-bar__fill" style="width:${barPct}%"></span></span>
-                </td>
-                <td>${covPct}%</td>
-                <td>${semPct}%</td>
-              </tr>
-            `;
+                  <tr>
+                    <td style="max-width:180px;font-size:.82rem">${row.question || '—'}</td>
+                    <td style="max-width:220px">${row.student}</td>
+                    <td>
+                      <span class="score-chip ${chipClass}">${row.score.toFixed(2)} / ${row.maxScore}</span>
+                      <span class="mini-bar"><span class="mini-bar__fill" style="width:${barPct}%"></span></span>
+                    </td>
+                    <td style="color:#fbbf24;font-family:monospace">${row.stage1.toFixed(2)}</td>
+                    <td style="color:#38bdf8;font-family:monospace">${row.stage2.toFixed(2)}</td>
+                    <td>${covPct}%</td>
+                  </tr>
+                `;
     }).join('')}
-        </tbody>
-      </table>
-    </div>
-    <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end;">
-      <button class="btn btn--ghost btn--sm" id="export-csv-btn">⬇ Export Results</button>
-    </div>
-  `;
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn--ghost btn--sm" id="export-csv-btn">⬇ Export Results</button>
+      </div>
+    `;
 
-    // Sort on header click
     batchTableWrap.querySelectorAll('th[data-col]').forEach(th => {
         th.addEventListener('click', () => {
             const newCol = th.dataset.col;
@@ -413,19 +440,19 @@ function renderTable(col, asc) {
         });
     });
 
-    // Export button
     document.getElementById('export-csv-btn')?.addEventListener('click', exportCsv);
 }
 
 function exportCsv() {
-    const headers = ['question', 'student_answer', 'score', 'max_score', 'concepts_covered_%', 'semantic_match_%'];
+    const headers = ['question', 'student_answer', 'final_score', 'stage1_rule', 'stage2_ai', 'max_score', 'concepts_covered_%'];
     const rows = batchData.map(r => [
         `"${(r.question || '').replace(/"/g, '""')}"`,
         `"${r.student.replace(/"/g, '""')}"`,
         r.score.toFixed(3),
+        r.stage1.toFixed(3),
+        r.stage2.toFixed(3),
         r.maxScore,
         Math.round(r.coverage * 100),
-        Math.round(r.semantic * 100),
     ].join(','));
 
     const csv = [headers.join(','), ...rows].join('\n');
@@ -440,7 +467,7 @@ function exportCsv() {
 }
 
 // ─────────────────────────────────────────
-// SAMPLE Q&A prefill
+// Sample Q&A prefill
 // ─────────────────────────────────────────
 
 document.getElementById('try-sample')?.addEventListener('click', () => {

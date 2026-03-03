@@ -193,38 +193,254 @@ def _generate_plain_english_explanation(score, feature_dict, shap_vals_row, max_
     return "\n".join(lines)
 
 
-def explain_prediction(model, explainer, feature_dict, max_score=5.0):
+STOPWORDS = {
+    'a','an','the','is','are','was','were','be','been','being','have','has','had',
+    'do','does','did','will','would','could','should','may','might','shall','can',
+    'to','of','in','for','on','with','at','by','from','as','into','through',
+    'and','but','or','nor','so','yet','both','either','neither','not','no',
+    'that','this','these','those','which','who','what','how','when','where','why',
+    'if','because','while','although','though','since','unless','until','than',
+    'i','you','he','she','it','we','they','me','him','her','us','them',
+    'my','your','his','its','our','their','all','each','any','more','most',
+    'other','some','only','very','just','s','t','re','ve'
+}
+
+def _content_tokens(text):
+    """Lowercase words, strip punctuation, remove stopwords."""
+    import re
+    words = re.sub(r'[^a-z0-9\s]', ' ', text.lower()).split()
+    return [w for w in words if w and w not in STOPWORDS]
+
+def _all_tokens(text):
+    """Same but keeping stopwords — used for student side (broad match)."""
+    import re
+    return re.sub(r'[^a-z0-9\s]', ' ', text.lower()).split()
+
+# ─────────────────────────────────────────────────────────────
+# STAGE 1 — Rule-Based Direct Word Match (floor / minimum)
+# ─────────────────────────────────────────────────────────────
+
+def rule_based_score(reference_answer: str, student_answer: str, max_score: float = 5.0) -> float:
     """
-    Explains a single prediction with:
-      PART 1 — Plain English paragraph a student can understand
-      PART 2 — Raw SHAP feature attributions for technical reference
+    Computes a floor score using direct word matching.
+
+    Logic:
+      1. Exact string match  → full marks immediately.
+      2. Otherwise: word-level recall = what % of the reference's content
+         words appear anywhere in the student answer.
+      3. Bigram bonus (+up to 15%): phrases like "carbon dioxide" match as units.
+
+    This score is the MINIMUM the student can receive. The AI stage can only add to it.
     """
-    # Convert dict to dataframe row
+    if not reference_answer.strip() or not student_answer.strip():
+        return 0.0
+
+    # ── Exact match → full marks ──────────────────────────────
+    import re
+    def normalise(t):
+        return re.sub(r'\s+', ' ', re.sub(r'[^a-z0-9\s]', ' ', t.lower())).strip()
+
+    if normalise(reference_answer) == normalise(student_answer):
+        return max_score
+
+    # ── Word-level recall ─────────────────────────────────────
+    ref_words = _content_tokens(reference_answer)
+    if not ref_words:
+        return 0.0
+
+    stu_word_set = set(_all_tokens(student_answer))
+    matched_words = sum(1 for w in ref_words if w in stu_word_set)
+    word_recall = matched_words / len(ref_words)
+
+    # ── Bigram bonus ──────────────────────────────────────────
+    ref_content = _content_tokens(reference_answer)
+    ref_bigrams = [f"{ref_content[i]} {ref_content[i+1]}" for i in range(len(ref_content)-1)]
+    stu_norm    = normalise(student_answer)
+    bigram_hits = sum(1 for bg in ref_bigrams if bg in stu_norm) if ref_bigrams else 0
+    bigram_bonus = (bigram_hits / len(ref_bigrams) * 0.15) if ref_bigrams else 0
+
+    rule_ratio = min(1.0, word_recall + bigram_bonus)
+    return rule_ratio * max_score
+
+
+# ─────────────────────────────────────────────────────────────
+# STAGE 2 — Semantic / AI Score (Random Forest)
+# ─────────────────────────────────────────────────────────────
+
+def semantic_score(model, feature_dict: dict, max_score: float = 5.0) -> float:
+    """Predict score using the RF model features (Stage 2)."""
     feature_df = pd.DataFrame([feature_dict])
+    raw = model.predict(feature_df)[0]
+    return float(np.clip(raw, 0, max_score))
 
-    # Predict score
-    score = model.predict(feature_df)[0]
 
-    # Get SHAP values
-    shap_vals = explainer.shap_values(feature_df)
-    shap_vals_row = shap_vals[0]   # shape (n_features,)
+# ─────────────────────────────────────────────────────────────
+# TWO-STAGE PREDICTION  → final = max(stage1_rule, stage2_semantic)
+# ─────────────────────────────────────────────────────────────
+
+def two_stage_predict(model, reference_answer: str, student_answer: str,
+                      feature_dict: dict, max_score: float = 5.0) -> dict:
+    """
+    Returns:
+        stage1_score  : rule-based word-match floor
+        stage2_score  : RF semantic score
+        final_score   : max(stage1, stage2)
+        winner        : which stage determined the final score
+    """
+    stage1 = rule_based_score(reference_answer, student_answer, max_score)
+    stage2 = semantic_score(model, feature_dict, max_score)
+    final  = max(stage1, stage2)
+    return {
+        'stage1_score': stage1,
+        'stage2_score': stage2,
+        'final_score':  final,
+        'winner': 'rule_based' if stage1 >= stage2 else 'semantic_ai',
+    }
+
+
+def _generate_plain_english_explanation(score, feature_dict, shap_vals_row, max_score=5.0):
+    """
+    Converts SHAP values and feature values into plain English sentences
+    that a student can understand without any knowledge of machine learning.
+    """
+    avg_sem   = feature_dict.get('feat_avg_semantic',    0.0)
+    max_sem   = feature_dict.get('feat_max_semantic',    0.0)
+    coverage  = feature_dict.get('feat_anchors_covered', 0.0)
+    jaccard   = feature_dict.get('feat_avg_jaccard',     0.0)
+    edit_sim  = feature_dict.get('feat_avg_edit',        0.0)
+
+    feature_names = [
+        'feat_avg_semantic', 'feat_max_semantic',
+        'feat_anchors_covered', 'feat_avg_jaccard', 'feat_avg_edit'
+    ]
+    shap_map = dict(zip(feature_names, shap_vals_row))
+    lines = []
+
+    pct = score / max_score
+    if pct >= 0.85:
+        overall = (f"Your answer is excellent! You scored {score:.2f} out of {max_score:.1f}, "
+                   f"placing you among the top performers.")
+    elif pct >= 0.65:
+        overall = (f"Your answer is good. You scored {score:.2f} out of {max_score:.1f}. "
+                   f"You covered most of what was expected, with a little room to improve.")
+    elif pct >= 0.40:
+        overall = (f"Your answer is partially correct. You scored {score:.2f} out of {max_score:.1f}. "
+                   f"You got some important points, but missed several key ideas.")
+    else:
+        overall = (f"Your answer needs significant improvement. You scored {score:.2f} out of {max_score:.1f}. "
+                   f"The answer is missing most of the core concepts expected.")
+    lines.append(overall)
+    lines.append("")
+
+    covered_pct = int(round(coverage * 100))
+    shap_cov = shap_map.get('feat_anchors_covered', 0)
+    if covered_pct >= 70:
+        cov_sentence = (f"✔ You addressed approximately {covered_pct}% of the key concepts "
+                        f"required in the ideal answer — this was a strong factor in your favour.")
+    elif covered_pct >= 40:
+        direction = "raised" if shap_cov > 0 else "lowered"
+        cov_sentence = (f"⚠ You addressed only about {covered_pct}% of the key concepts "
+                        f"required. Missing the remaining concepts {direction} your mark.")
+    else:
+        cov_sentence = (f"✘ You addressed very few ({covered_pct}%) of the key concepts expected "
+                        f"in a complete answer. This was the biggest reason your score is low.")
+    lines.append(cov_sentence)
+
+    if avg_sem >= 0.55:
+        sem_sentence = (f"✔ The overall meaning of your answer closely matched the expected answer "
+                        f"(semantic similarity: {avg_sem:.0%}). This shows you understood the topic well.")
+    elif avg_sem >= 0.35:
+        sem_sentence = (f"⚠ The meaning of your answer partially matched the expected answer "
+                        f"(semantic similarity: {avg_sem:.0%}). Your explanation could be more precise.")
+    else:
+        sem_sentence = (f"✘ The meaning of your answer was quite different from the expected answer "
+                        f"(semantic similarity: {avg_sem:.0%}). The grader could not identify the core idea.")
+    lines.append(sem_sentence)
+
+    if max_sem >= 0.65:
+        lines.append(f"   Your best phrase was a strong match (peak similarity: {max_sem:.0%}).")
+    elif max_sem >= 0.45:
+        lines.append(f"   Your best phrase was a partial match (peak similarity: {max_sem:.0%}). Try to be more specific.")
+    else:
+        lines.append(f"   Even your closest phrase had low match (peak similarity: {max_sem:.0%}) — try correct terminology.")
+
+    if jaccard >= 0.30:
+        jac_sentence = (f"✔ You used many of the same key words as the model answer (word overlap: {jaccard:.0%}).")
+    elif jaccard >= 0.15:
+        jac_sentence = (f"⚠ You used some expected vocabulary (word overlap: {jaccard:.0%}), but more subject-specific terms would help.")
+    else:
+        jac_sentence = (f"✘ Very few key words from the model answer appeared in your response (word overlap: {jaccard:.0%}).")
+    lines.append(jac_sentence)
+
+    if edit_sim >= 0.55:
+        edit_sentence = f"✔ The way you phrased your answer was very similar to the expected answer (phrasing similarity: {edit_sim:.0%})."
+    elif edit_sim >= 0.30:
+        edit_sentence = (f"➜ Your phrasing was somewhat similar (phrasing similarity: {edit_sim:.0%}). "
+                         f"Consider restructuring your sentences to be more concise.")
+    else:
+        edit_sentence = (f"✘ Your phrasing was quite different from the expected answer (phrasing similarity: {edit_sim:.0%}). "
+                         f"This may indicate you expressed ideas in an unrelated way or went off-topic.")
+    lines.append(edit_sentence)
+
+    lines.append("")
+    lines.append("💡 How to improve:")
+    if covered_pct < 70: lines.append("   • Re-read the question carefully and address ALL required points.")
+    if avg_sem < 0.50:   lines.append("   • Focus on expressing the core idea more clearly and directly.")
+    if jaccard < 0.25:   lines.append("   • Use domain-specific vocabulary and keywords from your notes/textbook.")
+    if edit_sim < 0.40:  lines.append("   • Write more structured, concise sentences that match the question's scope.")
+
+    return "\n".join(lines)
+
+
+def explain_prediction(model, explainer, feature_dict,
+                       reference_answer: str = "", student_answer: str = "",
+                       max_score: float = 5.0):
+    """
+    Full two-stage prediction explanation:
+      STAGE 1 — Rule-based word-match floor
+      STAGE 2 — Semantic / AI (Random Forest)
+      FINAL   — max(stage1, stage2)
+
+    Outputs:
+      PART 1 — Plain English explanation for the student
+      PART 2 — SHAP feature attributions for technical reference
+    """
+    feature_df    = pd.DataFrame([feature_dict])
+    shap_vals     = explainer.shap_values(feature_df)
+    shap_vals_row = shap_vals[0]
+
+    # ── Two-stage scoring ──────────────────────────────────────
+    scores = two_stage_predict(model, reference_answer, student_answer,
+                               feature_dict, max_score)
+    stage1 = scores['stage1_score']
+    stage2 = scores['stage2_score']
+    final  = scores['final_score']
+    winner = scores['winner']
 
     # ══════════════════════════════════════════════════════════
-    # PART 1 – Plain English Explanation
+    print("\n" + "=" * 65)
+    print(f"  TWO-STAGE SCORE BREAKDOWN")
+    print("=" * 65)
+    print(f"  ⚖️  Stage 1 · Rule-Based (word match)  : {stage1:.2f} / {max_score}")
+    print(f"  🤖 Stage 2 · Semantic AI  (RF model)   : {stage2:.2f} / {max_score}")
+    print(f"  {'─' * 45}")
+    print(f"  🏆 Final Score = max(stage1, stage2)   : {final:.2f} / {max_score}  "
+          f"  ← {'rule-based floor wins' if winner == 'rule_based' else 'AI semantic bonus'}")
+    print("=" * 65)
+
     # ══════════════════════════════════════════════════════════
-    print("\n" + "=" * 60)
-    print(f"  PREDICTED SCORE: {score:.2f} / {max_score:.1f}")
-    print("=" * 60)
+    # PART 1 – Plain English
+    # ══════════════════════════════════════════════════════════
     print("\n📝 WHAT THIS SCORE MEANS  (Plain English)\n")
     english_explanation = _generate_plain_english_explanation(
-        score, feature_dict, shap_vals_row, max_score=max_score
+        final, feature_dict, shap_vals_row, max_score=max_score
     )
     print(english_explanation)
 
     # ══════════════════════════════════════════════════════════
-    # PART 2 – SHAP Feature Attributions (Technical Detail)
+    # PART 2 – SHAP Feature Attributions
     # ══════════════════════════════════════════════════════════
-    print("\n" + "-" * 60)
+    print("\n" + "-" * 65)
     print("📊 SHAP FEATURE ATTRIBUTIONS  (Technical Detail)\n")
     print(f"  {'Feature':<28} {'Value':>10}   {'SHAP Impact':>12}   Direction")
     print(f"  {'-'*28}   {'-'*10}   {'-'*12}   {'-'*9}")
@@ -233,38 +449,43 @@ def explain_prediction(model, explainer, feature_dict, max_score=5.0):
         shap = shap_vals_row[i]
         direction = "▲ raises score" if shap > 0 else "▼ lowers score"
         print(f"  {col:<28} {val:>10.4f}   {shap:>+12.4f}   {direction}")
-    print("-" * 60)
+    print("-" * 65)
 
-    return score, shap_vals
+    return final, shap_vals
 
 if __name__ == "__main__":
     file_path = "C:/Users/deii/Desktop/cloud/mohler_dataset_edited.csv"
     try:
         # 1. Load data
         df = load_dataset(file_path)
-        
-        # For demonstration, subset the data to speed things up (full dataset takes time)
+
+        # For demonstration, subset the data to speed things up
         print("Using subset of 200 samples for demonstration...")
         df_subset = df.head(200).copy()
-        
+
         # 2. Extract anchors & generate Semantic Mapping Features
         df_featured = build_feature_dataset(df_subset)
-        
+
         # 3. Train Model and Explainer
         model, explainer = train_and_save_model(df_featured)
-        
-        # 4. Demonstrate Explainability on the first row
+
+        # 4. Demonstrate two-stage explainability on the first row
         row = df_featured.iloc[0]
         sample_features = {
-            'feat_avg_semantic': row['feat_avg_semantic'],
-            'feat_max_semantic': row['feat_max_semantic'],
+            'feat_avg_semantic':    row['feat_avg_semantic'],
+            'feat_max_semantic':    row['feat_max_semantic'],
             'feat_anchors_covered': row['feat_anchors_covered'],
-            'feat_avg_jaccard': row['feat_avg_jaccard'],
-            'feat_avg_edit': row['feat_avg_edit']
+            'feat_avg_jaccard':     row['feat_avg_jaccard'],
+            'feat_avg_edit':        row['feat_avg_edit']
         }
-        
-        explain_prediction(model, explainer, sample_features)
-        
+
+        # Pass the original text so Stage 1 (rule-based) can be computed
+        explain_prediction(
+            model, explainer, sample_features,
+            reference_answer=str(row.get('desired_answer', '')),
+            student_answer=str(row.get('student_answer', '')),
+        )
+
     except Exception as e:
         import traceback
         traceback.print_exc()
