@@ -93,7 +93,7 @@ function scoreColorClass(score, maxScore) {
 // ─────────────────────────────────────────
 
 function renderScoreDisplay(scoreObj, maxScore) {
-    const { stage1, stage2, final } = scoreObj;
+    const { stage1, stage2, stage3, final } = scoreObj;
     const el = document.getElementById('score-display');
     const color = scoreColor(final, maxScore);
     const pct = final / maxScore;
@@ -113,29 +113,33 @@ function renderScoreDisplay(scoreObj, maxScore) {
 
     // ── Stage breakdown panel ──
     const breakdown = document.getElementById('stage-breakdown');
-    const winner = stage1 >= stage2 ? 'rule' : 'ai';
 
     breakdown.innerHTML = `
       <div class="stage-grid">
-        <div class="stage-item ${winner === 'rule' ? 'stage-item--winner' : ''}">
+        <div class="stage-item">
           <div class="stage-item__icon">⚖️</div>
-          <div class="stage-item__label">Stage 1 · Rule-Based</div>
-          <div class="stage-item__score" style="color:#fbbf24">${stage1.toFixed(2)}</div>
+          <div class="stage-item__label">Rule-Based</div>
+          <div class="stage-item__score" style="color:#fbbf24">+${stage1.toFixed(2)}</div>
           <div class="stage-item__sub">Direct word match</div>
-          ${winner === 'rule' ? '<div class="stage-winner-badge">🏆 Determines Final</div>' : ''}
         </div>
-        <div class="stage-vs">MAX</div>
-        <div class="stage-item ${winner === 'ai' ? 'stage-item--winner' : ''}">
+        <div class="stage-vs">+</div>
+        <div class="stage-item">
           <div class="stage-item__icon">🤖</div>
-          <div class="stage-item__label">Stage 2 · Semantic AI</div>
-          <div class="stage-item__score" style="color:#38bdf8">${stage2.toFixed(2)}</div>
-          <div class="stage-item__sub">Meaning + concept coverage</div>
-          ${winner === 'ai' ? '<div class="stage-winner-badge">🏆 Determines Final</div>' : ''}
+          <div class="stage-item__label">AI Word Semantic</div>
+          <div class="stage-item__score" style="color:#38bdf8">+${stage2.toFixed(2)}</div>
+          <div class="stage-item__sub">AI Bonus & Concept coverage</div>
+        </div>
+        <div class="stage-vs">+</div>
+        <div class="stage-item">
+          <div class="stage-item__icon">📝</div>
+          <div class="stage-item__label">Sentence Context</div>
+          <div class="stage-item__score" style="color:#8b5cf6">+${stage3.toFixed(2)}</div>
+          <div class="stage-item__sub">Complete semantic context</div>
         </div>
       </div>
       <div class="stage-final-note">
-        Final score = <strong>max(${stage1.toFixed(2)}, ${stage2.toFixed(2)}) = ${final.toFixed(2)}</strong>
-        — the AI score can only <em>raise</em> the rule-based floor, never lower it.
+        Final score = <strong>min(${maxScore.toFixed(0)}, ${stage1.toFixed(2)} + ${stage2.toFixed(2)} + ${stage3.toFixed(2)}) = ${final.toFixed(2)}</strong>
+        — scores are added and capped at the maximum possible mark.
       </div>
     `;
 }
@@ -340,9 +344,10 @@ function processCsvFile(file) {
                     scored.push({
                         question: (row[colQ] || '').slice(0, 100),
                         student: stu.slice(0, 120),
-                        score: res.scoreObj.final,     // two-stage final
+                        score: res.scoreObj.final,
                         stage1: res.scoreObj.stage1,
                         stage2: res.scoreObj.stage2,
+                        stage3: res.scoreObj.stage3,
                         maxScore: maxScoreDefault,
                         coverage: res.features.feat_anchors_covered,
                         semantic: res.features.feat_avg_semantic,
@@ -388,8 +393,9 @@ function renderTable(col, asc) {
         { key: 'question', label: 'Question' },
         { key: 'student', label: 'Student Answer' },
         { key: 'score', label: 'Final Score ↕' },
-        { key: 'stage1', label: 'Rule-Based' },
-        { key: 'stage2', label: 'AI Score' },
+        { key: 'stage1', label: 'Rule' },
+        { key: 'stage2', label: 'AI Words' },
+        { key: 'stage3', label: 'Sentence Context' },
         { key: 'coverage', label: 'Concepts %' },
     ];
 
@@ -419,6 +425,7 @@ function renderTable(col, asc) {
                     </td>
                     <td style="color:#fbbf24;font-family:monospace">${row.stage1.toFixed(2)}</td>
                     <td style="color:#38bdf8;font-family:monospace">${row.stage2.toFixed(2)}</td>
+                    <td style="color:#8b5cf6;font-family:monospace">${row.stage3 ? row.stage3.toFixed(2) : '-'}</td>
                     <td>${covPct}%</td>
                   </tr>
                 `;
@@ -444,13 +451,14 @@ function renderTable(col, asc) {
 }
 
 function exportCsv() {
-    const headers = ['question', 'student_answer', 'final_score', 'stage1_rule', 'stage2_ai', 'max_score', 'concepts_covered_%'];
+    const headers = ['question', 'student_answer', 'final_score', 'stage1_rule', 'stage2_ai', 'stage3_sentence', 'max_score', 'concepts_covered_%'];
     const rows = batchData.map(r => [
         `"${(r.question || '').replace(/"/g, '""')}"`,
         `"${r.student.replace(/"/g, '""')}"`,
         r.score.toFixed(3),
         r.stage1.toFixed(3),
         r.stage2.toFixed(3),
+        (r.stage3 || 0).toFixed(3),
         r.maxScore,
         Math.round(r.coverage * 100),
     ].join(','));

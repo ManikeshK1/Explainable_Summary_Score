@@ -263,6 +263,42 @@ def rule_based_score(reference_answer: str, student_answer: str, max_score: floa
     return rule_ratio * max_score
 
 
+def tfidf_cosine_sim(text1: str, text2: str) -> float:
+    """Computes TF-IDF Cosine Similarity between two texts, mirroring JS logic."""
+    import math
+    toks1 = _content_tokens(text1)
+    toks2 = _content_tokens(text2)
+    if not toks1 or not toks2:
+        return 0.0
+    
+    def build_tf(toks):
+        import collections
+        freq = collections.Counter(toks)
+        tot = len(toks) or 1
+        return {k: v / tot for k, v in freq.items()}
+    
+    tf1, tf2 = build_tf(toks1), build_tf(toks2)
+    all_terms = set(tf1.keys()).union(set(tf2.keys()))
+    
+    idf = {}
+    for t in all_terms:
+        doc_count = (1 if t in tf1 else 0) + (1 if t in tf2 else 0)
+        idf[t] = math.log(3 / (1 + doc_count))
+        
+    dot, mag1, mag2 = 0.0, 0.0, 0.0
+    for t in all_terms:
+        v1 = tf1.get(t, 0) * idf[t]
+        v2 = tf2.get(t, 0) * idf[t]
+        dot += v1 * v2
+        mag1 += v1 * v1
+        mag2 += v2 * v2
+        
+    if mag1 == 0 or mag2 == 0:
+        return 0.0
+    val = dot / (math.sqrt(mag1) * math.sqrt(mag2))
+    return max(0.0, min(1.0, val))
+
+
 # ─────────────────────────────────────────────────────────────
 # STAGE 2 — Semantic / AI Score (Random Forest)
 # ─────────────────────────────────────────────────────────────
@@ -275,26 +311,27 @@ def semantic_score(model, feature_dict: dict, max_score: float = 5.0) -> float:
 
 
 # ─────────────────────────────────────────────────────────────
-# TWO-STAGE PREDICTION  → final = max(stage1_rule, stage2_semantic)
+# THREE-STAGE PREDICTION
 # ─────────────────────────────────────────────────────────────
 
-def two_stage_predict(model, reference_answer: str, student_answer: str,
+def three_stage_predict(model, reference_answer: str, student_answer: str,
                       feature_dict: dict, max_score: float = 5.0) -> dict:
     """
     Returns:
         stage1_score  : rule-based word-match floor
         stage2_score  : RF semantic score
-        final_score   : max(stage1, stage2)
-        winner        : which stage determined the final score
+        stage3_score  : complete sentence context score
+        final_score   : min(max_score, stage1 + stage2 + stage3)
     """
     stage1 = rule_based_score(reference_answer, student_answer, max_score)
     stage2 = semantic_score(model, feature_dict, max_score)
-    final  = max(stage1, stage2)
+    stage3 = tfidf_cosine_sim(reference_answer, student_answer) * max_score
+    final  = min(max_score, stage1 + stage2 + stage3)
     return {
         'stage1_score': stage1,
         'stage2_score': stage2,
-        'final_score':  final,
-        'winner': 'rule_based' if stage1 >= stage2 else 'semantic_ai',
+        'stage3_score': stage3,
+        'final_score':  final
     }
 
 
@@ -396,10 +433,11 @@ def explain_prediction(model, explainer, feature_dict,
                        reference_answer: str = "", student_answer: str = "",
                        max_score: float = 5.0):
     """
-    Full two-stage prediction explanation:
-      STAGE 1 — Rule-based word-match floor
+    Full three-stage prediction explanation:
+      STAGE 1 — Rule-based word-match
       STAGE 2 — Semantic / AI (Random Forest)
-      FINAL   — max(stage1, stage2)
+      STAGE 3 — Complete sentence context
+      FINAL   — Capped Sum
 
     Outputs:
       PART 1 — Plain English explanation for the student
@@ -409,23 +447,23 @@ def explain_prediction(model, explainer, feature_dict,
     shap_vals     = explainer.shap_values(feature_df)
     shap_vals_row = shap_vals[0]
 
-    # ── Two-stage scoring ──────────────────────────────────────
-    scores = two_stage_predict(model, reference_answer, student_answer,
-                               feature_dict, max_score)
+    # ── Three-stage scoring ──────────────────────────────────────
+    scores = three_stage_predict(model, reference_answer, student_answer,
+                                 feature_dict, max_score)
     stage1 = scores['stage1_score']
     stage2 = scores['stage2_score']
+    stage3 = scores['stage3_score']
     final  = scores['final_score']
-    winner = scores['winner']
 
     # ══════════════════════════════════════════════════════════
     print("\n" + "=" * 65)
-    print(f"  TWO-STAGE SCORE BREAKDOWN")
+    print(f"  THREE-STAGE SCORE BREAKDOWN")
     print("=" * 65)
-    print(f"  ⚖️  Stage 1 · Rule-Based (word match)  : {stage1:.2f} / {max_score}")
-    print(f"  🤖 Stage 2 · Semantic AI  (RF model)   : {stage2:.2f} / {max_score}")
+    print(f"  ⚖️  Stage 1 · Rule-Based (word match)  : +{stage1:.2f}")
+    print(f"  🤖 Stage 2 · Semantic AI  (RF model)   : +{stage2:.2f}")
+    print(f"  📝 Stage 3 · Complete Sentence Context : +{stage3:.2f}")
     print(f"  {'─' * 45}")
-    print(f"  🏆 Final Score = max(stage1, stage2)   : {final:.2f} / {max_score}  "
-          f"  ← {'rule-based floor wins' if winner == 'rule_based' else 'AI semantic bonus'}")
+    print(f"  🏆 Final Score (capped at {max_score:.0f})       :  {final:.2f} / {max_score}")
     print("=" * 65)
 
     # ══════════════════════════════════════════════════════════
@@ -469,7 +507,7 @@ if __name__ == "__main__":
         # 3. Train Model and Explainer
         model, explainer = train_and_save_model(df_featured)
 
-        # 4. Demonstrate two-stage explainability on the first row
+        # 4. Demonstrate three-stage explainability on the first row
         row = df_featured.iloc[0]
         sample_features = {
             'feat_avg_semantic':    row['feat_avg_semantic'],

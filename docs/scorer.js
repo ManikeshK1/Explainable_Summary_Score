@@ -280,8 +280,9 @@ function semanticScore(features, maxScore = 5) {
 function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
     const stage1 = ruleBasedScore(referenceAnswer, studentAnswer, maxScore);
     const stage2 = semanticScore(features, maxScore);
-    const final = Math.max(stage1, stage2);
-    return { stage1, stage2, final };
+    const stage3 = tfidfCosineSim(referenceAnswer, studentAnswer) * maxScore;
+    const final = Math.min(maxScore, stage1 + stage2 + stage3);
+    return { stage1, stage2, stage3, final };
 }
 
 // ─────────────────────────────────────────────────────────────

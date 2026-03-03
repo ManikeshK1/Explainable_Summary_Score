@@ -229,7 +229,7 @@
               <div class="score-bar">
                 <div class="score-bar__fill" id="score-bar-fill"></div>
               </div>
-              <!-- Two-stage breakdown rendered by app.js -->
+              <!-- Three-stage breakdown rendered by app.js -->
               <div id="stage-breakdown"></div>
             </div>
 
@@ -397,7 +397,8 @@
               <tbody>
                 <tr>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_anchors_covered</code></td>
+                    <code>feat_anchors_covered</code>
+                  </td>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
                     Fraction of key-concept anchors from the ideal answer that the student addressed (threshold 0.35
                     cosine)</td>
@@ -407,7 +408,8 @@
                 </tr>
                 <tr>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_avg_semantic</code></td>
+                    <code>feat_avg_semantic</code>
+                  </td>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
                     Average cosine similarity between the student answer embedding and each anchor embedding</td>
                   <td
@@ -416,7 +418,8 @@
                 </tr>
                 <tr>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_max_semantic</code></td>
+                    <code>feat_max_semantic</code>
+                  </td>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Best
                     (maximum) cosine similarity score across all anchor comparisons — captures the student's strongest
                     matching phrase</td>
@@ -426,7 +429,8 @@
                 </tr>
                 <tr>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_avg_jaccard</code></td>
+                    <code>feat_avg_jaccard</code>
+                  </td>
                   <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
                     Average Jaccard word-set overlap between the student answer and each anchor — rewards correct
                     terminology</td>
