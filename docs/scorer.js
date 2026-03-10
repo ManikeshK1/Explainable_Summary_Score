@@ -333,6 +333,21 @@ function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
 // Baseline set to 0.40 (average student on Mohler dataset)
 // ─────────────────────────────────────────────────────────────
 
+// WEIGHTS used by shapValues for attribution display.
+// Mapped to the paper's published weights (PMC12171532):
+//   Semantic (USE)       wtf = 0.50  → feat_avg_semantic
+//   Cosine               wc  = 0.15  → feat_max_semantic
+//   Normalized Word Count ww = 0.15  → feat_anchors_covered
+//   Jaccard              wj  = 0.15  → feat_avg_jaccard
+//   Edit Similarity      we  = 0.05  → feat_avg_edit
+const WEIGHTS = {
+    feat_avg_semantic: 0.50,
+    feat_max_semantic: 0.15,
+    feat_anchors_covered: 0.15,
+    feat_avg_jaccard: 0.15,
+    feat_avg_edit: 0.05,
+};
+
 const BASELINE = 0.40;
 
 function shapValues(features, maxScore = 5) {
