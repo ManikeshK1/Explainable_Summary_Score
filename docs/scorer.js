@@ -88,7 +88,10 @@ function editSimilarity(text1, text2) {
 
 // ─────────────────────────────────────────────────────────────
 // 4. TF-IDF COSINE SIMILARITY
-// Replaces the sentence-transformer model for in-browser use.
+// Used only for anchor-keyphrase extraction scoring.
+// NOTE: For the paper's Sc and Stf we use tfCosineSim (section 4B)
+// because TF-IDF on a 2-doc corpus zeros out shared words (IDF→0),
+// which gives ~0 similarity for two very similar texts.
 // ─────────────────────────────────────────────────────────────
 
 function buildTfVector(tokens) {
@@ -121,6 +124,40 @@ function tfidfCosineSim(text1, text2) {
     for (const t of allTerms) {
         const v1 = (tf1[t] || 0) * idf[t];
         const v2 = (tf2[t] || 0) * idf[t];
+        dot += v1 * v2;
+        mag1 += v1 * v1;
+        mag2 += v2 * v2;
+    }
+    if (!mag1 || !mag2) return 0;
+    return Math.max(0, Math.min(1, dot / (Math.sqrt(mag1) * Math.sqrt(mag2))));
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4B. PLAIN TF COSINE SIMILARITY  (no IDF weighting)
+// Used for the paper's Sc (cosine) and Stf (semantic approx).
+//
+// Why: TF-IDF on a 2-doc corpus assigns IDF=0 to every word
+// that appears in BOTH documents (log(3/3)=0), so two very
+// similar answers end up with cosine≈0. Plain TF cosine rewards
+// shared vocabulary and correctly gives high similarity when
+// student and reference answers share most of their words.
+// ─────────────────────────────────────────────────────────────
+
+function tfCosineSim(text1, text2) {
+    const toks1 = tokenize(text1);
+    const toks2 = tokenize(text2);
+    if (!toks1.length || !toks2.length) return 0;
+
+    // Raw term frequency (count) vectors
+    const tf1 = {}, tf2 = {};
+    for (const t of toks1) tf1[t] = (tf1[t] || 0) + 1;
+    for (const t of toks2) tf2[t] = (tf2[t] || 0) + 1;
+
+    const allTerms = new Set([...Object.keys(tf1), ...Object.keys(tf2)]);
+    let dot = 0, mag1 = 0, mag2 = 0;
+    for (const t of allTerms) {
+        const v1 = tf1[t] || 0;
+        const v2 = tf2[t] || 0;
         dot += v1 * v2;
         mag1 += v1 * v1;
         mag2 += v2 * v2;
@@ -187,10 +224,11 @@ function computeFeatures(referenceAnswer, studentAnswer, numAnchors = 5) {
         };
     }
 
-    // Per-anchor scores (mirrors evaluate_student_answer)
-    const COVERAGE_THRESHOLD = 0.35; // same as Python
+    // Per-anchor scores — use plain TF cosine (tfCosineSim) so shared
+    // words between the student answer and anchor are correctly rewarded.
+    const COVERAGE_THRESHOLD = 0.35;
 
-    const semanticScores = anchors.map(a => tfidfCosineSim(studentAnswer, a));
+    const semanticScores = anchors.map(a => tfCosineSim(studentAnswer, a));
     const jaccardScores = anchors.map(a => jaccardSimilarity(studentAnswer, a));
     const editScores = anchors.map(a => editSimilarity(studentAnswer, a));
 
@@ -294,9 +332,9 @@ function paperGradingScore(referenceAnswer, studentAnswer, maxScore = 5) {
 
     const Sj = jaccardSimilarity(referenceAnswer, studentAnswer);    // wj = 0.15
     const Se = editSimilarity(referenceAnswer, studentAnswer);        // we = 0.05
-    const Sc = tfidfCosineSim(referenceAnswer, studentAnswer);        // wc = 0.15
+    const Sc = tfCosineSim(referenceAnswer, studentAnswer);           // wc = 0.15  (word-freq cosine)
     const Sw = normalizedWordCount(referenceAnswer, studentAnswer);   // ww = 0.15
-    const Stf = tfidfCosineSim(referenceAnswer, studentAnswer);        // wtf= 0.50 (USE proxy)
+    const Stf = tfCosineSim(referenceAnswer, studentAnswer);           // wtf= 0.50  (USE proxy via TF cosine)
 
     // Equation (a): Combined NLP base score
     const Cnlp = Math.min(1.0, Math.max(0.0, 0.15 * Sj + 0.05 * Se + 0.15 * Sc + 0.15 * Sw));

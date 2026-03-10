@@ -264,7 +264,10 @@ def rule_based_score(reference_answer: str, student_answer: str, max_score: floa
 
 
 def tfidf_cosine_sim(text1: str, text2: str) -> float:
-    """Computes TF-IDF Cosine Similarity between two texts, mirroring JS logic."""
+    """Computes TF-IDF Cosine Similarity between two texts.
+    NOTE: Only used for anchor-extraction features.
+    For the paper's grading (Sc, Stf) use _tf_cosine_sim — see below.
+    """
     import math
     toks1 = _content_tokens(text1)
     toks2 = _content_tokens(text2)
@@ -297,6 +300,40 @@ def tfidf_cosine_sim(text1: str, text2: str) -> float:
         return 0.0
     val = dot / (math.sqrt(mag1) * math.sqrt(mag2))
     return max(0.0, min(1.0, val))
+
+
+def _tf_cosine_sim(text1: str, text2: str) -> float:
+    """
+    Plain TF cosine similarity (NO IDF weighting).
+
+    Used for the paper's Sc (cosine similarity) and Stf (semantic proxy).
+
+    Why not TF-IDF here:
+      With only 2 documents in the corpus, IDF = log(3/(1+count)).
+      For any word appearing in BOTH documents: IDF = log(3/3) = 0.
+      This zeros out all shared words — so two very similar answers
+      score ~0 and trigger the paper's F=0 rule (Stf<0.2).
+      Plain TF cosine correctly rewards shared vocabulary.
+    """
+    import math
+    import collections
+
+    toks1 = _all_tokens(text1)
+    toks2 = _all_tokens(text2)
+    if not toks1 or not toks2:
+        return 0.0
+
+    tf1 = collections.Counter(toks1)
+    tf2 = collections.Counter(toks2)
+    all_terms = set(tf1) | set(tf2)
+
+    dot  = sum(tf1.get(t, 0) * tf2.get(t, 0) for t in all_terms)
+    mag1 = math.sqrt(sum(v * v for v in tf1.values()))
+    mag2 = math.sqrt(sum(v * v for v in tf2.values()))
+
+    if mag1 == 0 or mag2 == 0:
+        return 0.0
+    return max(0.0, min(1.0, dot / (mag1 * mag2)))
 
 
 # ─────────────────────────────────────────────────────────────
@@ -385,9 +422,9 @@ def paper_grading_score(reference_answer: str, student_answer: str,
 
     Sj  = _jaccard_similarity(reference_answer, student_answer)      # wj = 0.15
     Se  = _edit_similarity(reference_answer, student_answer)          # we = 0.05
-    Sc  = tfidf_cosine_sim(reference_answer, student_answer)          # wc = 0.15
+    Sc  = _tf_cosine_sim(reference_answer, student_answer)            # wc = 0.15  (plain TF cosine)
     Sw  = _normalized_word_count(reference_answer, student_answer)    # ww = 0.15
-    Stf = tfidf_cosine_sim(reference_answer, student_answer)          # wtf= 0.50 (USE proxy)
+    Stf = _tf_cosine_sim(reference_answer, student_answer)            # wtf= 0.50  (USE proxy via TF cosine)
 
     # Equation (a): Combined NLP base score
     Cnlp = min(1.0, max(0.0, 0.15*Sj + 0.05*Se + 0.15*Sc + 0.15*Sw))
