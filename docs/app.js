@@ -214,16 +214,155 @@ function renderShap(shap, maxScore) {
 }
 
 // ─────────────────────────────────────────
-// RENDER — Anchors
+// RENDER — Concept Clusters (Canvas Map)
 // ─────────────────────────────────────────
 
-function renderAnchors(anchors) {
-    const wrap = document.getElementById('anchors-wrap');
-    if (!anchors || !anchors.length) {
-        wrap.innerHTML = '<span class="anchor-tag">No anchors extracted</span>';
+function renderConceptClusters(clusters) {
+    const canvas = document.getElementById('cluster-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    if (!clusters || !clusters.length) {
+        ctx.fillStyle = '#575a75';
+        ctx.font = '14px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('No concepts extracted', width / 2, height / 2);
         return;
     }
-    wrap.innerHTML = anchors.map(a => `<span class="anchor-tag">${a}</span>`).join('');
+
+    // A simple physics-free layout: distribute circles pseudo-randomly but evenly
+    const nodes = [];
+    const padding = 10;
+
+    // Sort by importance (radius) descending so bigger ones get placed first easily
+    const sorted = [...clusters].sort((a, b) => b.radius - a.radius);
+
+    for (let i = 0; i < sorted.length; i++) {
+        const c = sorted[i];
+        let placed = false;
+        let tries = 0;
+        let x, y;
+
+        while (!placed && tries < 200) {
+            x = c.radius + padding + Math.random() * (width - 2 * (c.radius + padding));
+            y = c.radius + padding + Math.random() * (height - 2 * (c.radius + padding));
+
+            // Check collision
+            let collision = false;
+            for (const n of nodes) {
+                const dist = Math.hypot(n.x - x, n.y - y);
+                if (dist < c.radius + n.radius + 15) { // 15px minimum gap
+                    collision = true;
+                    break;
+                }
+            }
+
+            if (!collision) {
+                nodes.push({ ...c, x, y });
+                placed = true;
+            }
+            tries++;
+        }
+
+        // If it failed to place without collision (too crowded), just place it somewhere overlapping
+        if (!placed) {
+            nodes.push({ ...c, x: width / 2, y: height / 2 });
+        }
+    }
+
+    // Draw lines between nodes to look like a connected concept map
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(108, 99, 255, 0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            if (Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y) < 150) {
+                ctx.moveTo(nodes[i].x, nodes[i].y);
+                ctx.lineTo(nodes[j].x, nodes[j].y);
+            }
+        }
+    }
+    ctx.stroke();
+
+    // Draw nodes
+    for (const n of nodes) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, 2 * Math.PI);
+
+        // Color based on coverage
+        if (n.covered) {
+            ctx.fillStyle = 'rgba(74, 222, 128, 0.15)';
+            ctx.strokeStyle = '#4ade80';
+        } else {
+            ctx.fillStyle = 'rgba(248, 113, 113, 0.1)';
+            ctx.strokeStyle = 'rgba(248, 113, 113, 0.6)';
+        }
+
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? '#e8eaf6' : '#1a1a3e';
+        ctx.font = '600 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Wrapped text
+        const words = n.label.split(' ');
+        if (words.length <= 2) {
+            ctx.fillText(n.label, n.x, n.y);
+        } else {
+            ctx.fillText(words.slice(0, 2).join(' '), n.x, n.y - 6);
+            ctx.fillText(words.slice(2).join(' '), n.x, n.y + 8);
+        }
+    }
+
+    // Legend
+    document.getElementById('cluster-legend').innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(74, 222, 128, 0.15);border:2px solid #4ade80;"></span> Covered Component</div>
+        <div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:rgba(248, 113, 113, 0.1);border:2px solid rgba(248, 113, 113, 0.6);"></span> Missed Component</div>
+    `;
+}
+
+// ─────────────────────────────────────────
+// RENDER — ExASAG Sentence Attribution
+// ─────────────────────────────────────────
+
+function renderSentenceAttributions(sentences) {
+    const body = document.getElementById('sentence-attribution-body');
+    if (!sentences || !sentences.length) {
+        body.innerHTML = '<em>No sentences analyzed.</em>';
+        return;
+    }
+
+    // Find max magnitude to scale the bars
+    const maxAbs = Math.max(0.001, ...sentences.map(s => Math.abs(s.attribution)));
+
+    body.innerHTML = '<div class="exasag-sentences">' + sentences.map(s => {
+        const isPos = s.attribution >= 0;
+        const widthPct = Math.min(100, (Math.abs(s.attribution) / maxAbs) * 100);
+        const colorClass = isPos ? 'exasag-bar--pos' : 'exasag-bar--neg';
+        const sign = isPos ? '+' : '';
+        const attrStr = sign + s.attribution.toFixed(2);
+
+        return `
+            <div class="exasag-row">
+                <div class="exasag-text">"${s.text}"</div>
+                <div class="exasag-metrics">
+                    <span class="exasag-score" style="color: ${isPos ? 'var(--success)' : 'var(--danger)'}; width: 45px; display: inline-block; text-align: right;">${attrStr}</span>
+                    <div class="exasag-bar-track">
+                        <div class="exasag-bar ${colorClass}" style="width: ${widthPct}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('') + '</div>';
 }
 
 // ─────────────────────────────────────────
@@ -252,12 +391,13 @@ demoForm.addEventListener('submit', e => {
     setTimeout(() => {
         try {
             const result = gradeAnswer(ref, stu, maxSc);
-            const { scoreObj, features, shap, explanation } = result;
+            const { scoreObj, features, shap, explanation, sentences, clusters } = result;
 
             renderScoreDisplay(scoreObj, maxSc);
             renderExplanation(explanation);
             renderShap(shap, maxSc);
-            renderAnchors(features.anchors);
+            renderConceptClusters(clusters);
+            renderSentenceAttributions(sentences);
 
             spinner.classList.remove('active');
             resultPanel.classList.add('visible');

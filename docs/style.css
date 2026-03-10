@@ -1513,3 +1513,249 @@ pre {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   NEW COMPONENTS (ExASAG, METRICS, EQUATIONS)
+═══════════════════════════════════════════════════════════════ */
+
+/* Cluster Visualisation */
+.cluster-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cluster-header h3 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.cluster-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 16px;
+}
+
+/* ExASAG Sentence Attribution */
+.exasag-info {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.exasag-sentences {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exasag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  gap: 24px;
+  transition: border-color var(--transition);
+}
+
+.exasag-row:hover {
+  border-color: var(--border);
+}
+
+.exasag-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.exasag-metrics {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+}
+
+.exasag-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.exasag-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.exasag-bar {
+  height: 100%;
+  border-radius: 3px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.exasag-bar--pos {
+  background: var(--success);
+}
+
+.exasag-bar--neg {
+  background: var(--danger);
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.metric-card {
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.metric-card:hover {
+  border-color: var(--border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-card__symbol {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.metric-card__weight {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.metric-card__name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.metric-card__desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Equation Box */
+.equation-box {
+  background: var(--card);
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.equation-box__title {
+  padding: 12px 20px;
+  background: rgba(108, 99, 255, 0.08);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.equation-box__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eq-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eq-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.eq-row code {
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  color: var(--text);
+  border: 1px solid var(--border-soft);
+  background: var(--bg2);
+}
+
+/* Reference List */
+.ref-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ref-item {
+  display: flex;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.ref-num {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  background: rgba(108, 99, 255, 0.15);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.ref-item strong {
+  color: var(--text);
+}
+
+.tbl-th {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.tbl-td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-soft);
+}

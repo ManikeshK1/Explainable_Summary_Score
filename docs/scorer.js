@@ -486,7 +486,63 @@ function generateExplanation(scoreObj, features, shapVals, maxScore = 5) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 10. TOP-LEVEL API — called by app.js
+// 10. ExASAG SENTENCE-LEVEL ATTRIBUTIONS & CLUSTERS
+// ─────────────────────────────────────────────────────────────
+
+function calculateSentenceAttributions(referenceAnswer, studentAnswer, maxScore) {
+    // Split student answer into sentences safely
+    const sentences = studentAnswer.replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|").map(s => s.trim()).filter(s => s.length > 0);
+    if (sentences.length === 0) return [];
+
+    // Score the full answer first
+    const fullFeatures = computeFeatures(referenceAnswer, studentAnswer);
+    const fullScore = predictScore(referenceAnswer, studentAnswer, fullFeatures, maxScore).final;
+
+    return sentences.map(sentence => {
+        // Score this individual sentence against the reference
+        const sentFeatures = computeFeatures(referenceAnswer, sentence);
+        const sentScoreObj = predictScore(referenceAnswer, sentence, sentFeatures, maxScore);
+
+        // Attribution is the difference relative to the average sentence contribution
+        // E.g., if a sentence scores higher than the total average density, it's a positive attribution
+        const diff = sentScoreObj.final - (fullScore / Math.max(1, sentences.length));
+
+        return {
+            text: sentence,
+            score: sentScoreObj.final,
+            attribution: diff
+        };
+    });
+}
+
+function calculateConceptClusters(referenceAnswer, studentAnswer, anchors) {
+    // Generate cluster bubbles: each anchor is a bubble.
+    // Size = importance (computed by word count/length proxy)
+    // Covered = does the student answer match this anchor > 0.35 similarity?
+
+    const coveredNodes = [];
+    for (const anchor of anchors) {
+        // Determine importance proxy based on length/words
+        const words = anchor.split(' ').length;
+        const importance = 20 + (words * 10); // Base radius + growth
+
+        // Determine if covered
+        const sim = tfCosineSim(studentAnswer, anchor);
+        const isCovered = sim >= 0.35;
+
+        coveredNodes.push({
+            label: anchor,
+            radius: importance,
+            covered: isCovered,
+            similarity: sim
+        });
+    }
+
+    return coveredNodes;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 11. TOP-LEVEL API — called by app.js
 // ─────────────────────────────────────────────────────────────
 
 /**
@@ -497,13 +553,22 @@ function generateExplanation(scoreObj, features, shapVals, maxScore = 5) {
  *   features    = raw NLP feature values
  *   shap        = per-feature SHAP-style attributions
  *   explanation = plain-English object { sections[], tips[] }
+ *   sentences   = ExASAG sentence-level attributions
+ *   clusters    = concept cluster coverage data
  */
 function gradeAnswer(referenceAnswer, studentAnswer, maxScore = 5) {
     const features = computeFeatures(referenceAnswer, studentAnswer);
     const scoreObj = predictScore(referenceAnswer, studentAnswer, features, maxScore);
     const shap = shapValues(features, maxScore);
     const explanation = generateExplanation(scoreObj, features, shap, maxScore);
-    return { scoreObj, maxScore, features, shap, explanation };
+
+    // 1. ExASAG Sentence-Level Attributions (SLA)
+    const sentences = calculateSentenceAttributions(referenceAnswer, studentAnswer, maxScore);
+
+    // 2. Cluster visual data (Reference anchors vs Student matches)
+    const clusters = calculateConceptClusters(referenceAnswer, studentAnswer, features.anchors);
+
+    return { scoreObj, maxScore, features, shap, explanation, sentences, clusters };
 }
 
 // Export for use as module OR global (GitHub Pages = global)
