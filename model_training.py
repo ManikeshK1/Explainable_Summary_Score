@@ -300,37 +300,130 @@ def tfidf_cosine_sim(text1: str, text2: str) -> float:
 
 
 # ─────────────────────────────────────────────────────────────
-# STAGE 2 — Semantic / AI Score (Random Forest)
+# PAPER GRADING HELPERS
+# Paper: "Automated grading using NLP and semantic analysis"
+# PMC12171532  —  Ahmad Ayaan & Kok-Why Ng
 # ─────────────────────────────────────────────────────────────
 
-def semantic_score(model, feature_dict: dict, max_score: float = 5.0) -> float:
-    """Predict score using the RF model features (Stage 2)."""
-    feature_df = pd.DataFrame([feature_dict])
-    raw = model.predict(feature_df)[0]
-    return float(np.clip(raw, 0, max_score))
+def _jaccard_similarity(text1: str, text2: str) -> float:
+    """Jaccard similarity between two texts using all (non-stopword) tokens."""
+    set1 = set(_all_tokens(text1))
+    set2 = set(_all_tokens(text2))
+    if not set1 or not set2:
+        return 0.0
+    return len(set1 & set2) / len(set1 | set2)
+
+
+def _edit_similarity(text1: str, text2: str) -> float:
+    """
+    Normalized character-level edit similarity.
+    Se = 1 - (edit_distance / max_char_length)
+    The paper uses the inverted form (Se)^-1 which equals this value.
+    """
+    try:
+        import Levenshtein
+        a, b = text1.lower(), text2.lower()
+        if not a and not b:
+            return 1.0
+        if not a or not b:
+            return 0.0
+        dist = Levenshtein.distance(a, b)
+        return 1.0 - dist / max(len(a), len(b))
+    except ImportError:
+        # Pure-Python fallback (no Levenshtein library)
+        a, b = text1.lower(), text2.lower()
+        longer = max(len(a), len(b))
+        if longer == 0:
+            return 1.0
+        common = sum(1 for c1, c2 in zip(a, b) if c1 == c2)
+        return common / longer
+
+
+def _normalized_word_count(reference_answer: str, student_answer: str) -> float:
+    """
+    Sw: reference keyword count / student keyword count, capped at 1.
+    Paper: "calculated by dividing the sample answer's keywords
+            by the student's answer's keywords."
+    """
+    ref_kw = _content_tokens(reference_answer)
+    stu_kw = _content_tokens(student_answer)
+    if not stu_kw:
+        return 0.0
+    return min(1.0, len(ref_kw) / len(stu_kw))
 
 
 # ─────────────────────────────────────────────────────────────
-# THREE-STAGE PREDICTION
+# STAGE 2 — Paper's Grading Method (PMC12171532)
+# ─────────────────────────────────────────────────────────────
+
+def paper_grading_score(reference_answer: str, student_answer: str,
+                        max_score: float = 5.0) -> float:
+    """
+    Implements the EXACT grading method from the paper (PMC12171532).
+
+    Weights:
+      Jaccard (wj)          = 0.15
+      Edit Similarity (we)  = 0.05   [(Se)^-1 inverted form]
+      Cosine (wc)           = 0.15
+      Norm. Word Count (ww) = 0.15
+      Semantic / USE (wtf)  = 0.50   [approximated with TF-IDF cosine]
+
+    Equations:
+      Cnlp = min(max(0, wj·Sj + we·Se + wc·Sc + ww·Sw), 1)      ...(a)
+      C    = min(max(0, wtf·Stf + (1-wtf)·Cnlp), 1)              ...(b)
+      F    = { 0  if Stf < 0.2                                    ...(c)
+             { 1  if Stf >= 0.9 AND Sw >= 0.85
+             { C  otherwise
+      M    = ceil(min(F · T, T))                                  ...(d)
+
+    Returns F * max_score (floating-point) so it can be summed
+    with the rule-based stage using the existing additive logic.
+    """
+    import math
+    if not reference_answer.strip() or not student_answer.strip():
+        return 0.0
+
+    Sj  = _jaccard_similarity(reference_answer, student_answer)      # wj = 0.15
+    Se  = _edit_similarity(reference_answer, student_answer)          # we = 0.05
+    Sc  = tfidf_cosine_sim(reference_answer, student_answer)          # wc = 0.15
+    Sw  = _normalized_word_count(reference_answer, student_answer)    # ww = 0.15
+    Stf = tfidf_cosine_sim(reference_answer, student_answer)          # wtf= 0.50 (USE proxy)
+
+    # Equation (a): Combined NLP base score
+    Cnlp = min(1.0, max(0.0, 0.15*Sj + 0.05*Se + 0.15*Sc + 0.15*Sw))
+
+    # Equation (b): Confidence score
+    C = min(1.0, max(0.0, 0.50*Stf + 0.50*Cnlp))
+
+    # Equation (c): Final score with threshold rules
+    if Stf < 0.2:
+        F = 0.0
+    elif Stf >= 0.9 and Sw >= 0.85:
+        F = 1.0
+    else:
+        F = C
+
+    return F * max_score
+
+
+# ─────────────────────────────────────────────────────────────
+# TWO-STAGE PREDICTION
 # ─────────────────────────────────────────────────────────────
 
 def three_stage_predict(model, reference_answer: str, student_answer: str,
-                      feature_dict: dict, max_score: float = 5.0) -> dict:
+                        feature_dict: dict, max_score: float = 5.0) -> dict:
     """
     Returns:
-        stage1_score  : rule-based word-match floor
-        stage2_score  : RF semantic score
-        stage3_score  : complete sentence context score
-        final_score   : min(max_score, stage1 + stage2 + stage3)
+        stage1_score : rule-based word-match floor
+        stage2_score : paper's NLP + semantic grading (PMC12171532)
+        final_score  : min(max_score, stage1 + stage2)
     """
     stage1 = rule_based_score(reference_answer, student_answer, max_score)
-    stage2 = semantic_score(model, feature_dict, max_score)
-    stage3 = tfidf_cosine_sim(reference_answer, student_answer) * max_score
-    final  = min(max_score, stage1 + stage2 + stage3)
+    stage2 = paper_grading_score(reference_answer, student_answer, max_score)
+    final  = min(max_score, stage1 + stage2)
     return {
         'stage1_score': stage1,
         'stage2_score': stage2,
-        'stage3_score': stage3,
         'final_score':  final
     }
 
@@ -447,23 +540,24 @@ def explain_prediction(model, explainer, feature_dict,
     shap_vals     = explainer.shap_values(feature_df)
     shap_vals_row = shap_vals[0]
 
-    # ── Three-stage scoring ──────────────────────────────────────
+    # ── Two-stage scoring (paper method) ────────────────────────
     scores = three_stage_predict(model, reference_answer, student_answer,
                                  feature_dict, max_score)
     stage1 = scores['stage1_score']
     stage2 = scores['stage2_score']
-    stage3 = scores['stage3_score']
     final  = scores['final_score']
 
     # ══════════════════════════════════════════════════════════
     print("\n" + "=" * 65)
-    print(f"  THREE-STAGE SCORE BREAKDOWN")
+    print(f"  SCORE BREAKDOWN  (PMC12171532 Grading Method)")
     print("=" * 65)
-    print(f"  ⚖️  Stage 1 · Rule-Based (word match)  : +{stage1:.2f}")
-    print(f"  🤖 Stage 2 · Semantic AI  (RF model)   : +{stage2:.2f}")
-    print(f"  📝 Stage 3 · Complete Sentence Context : +{stage3:.2f}")
+    print(f"  ⚖️  Stage 1 · Rule-Based (word match)         : +{stage1:.2f}")
+    print(f"  📄 Stage 2 · Paper NLP + Semantic Grade       : +{stage2:.2f}")
+    print(f"            (Cnlp=Jaccard·0.15+Edit·0.05")
+    print(f"                  +Cosine·0.15+NormWC·0.15)")
+    print(f"            (C   =0.5·Stf + 0.5·Cnlp)")
     print(f"  {'─' * 45}")
-    print(f"  🏆 Final Score (capped at {max_score:.0f})       :  {final:.2f} / {max_score}")
+    print(f"  🏆 Final Score (capped at {max_score:.0f})              :  {final:.2f} / {max_score}")
     print("=" * 65)
 
     # ══════════════════════════════════════════════════════════

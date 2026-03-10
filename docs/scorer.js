@@ -7,13 +7,19 @@
  *   • Exact match  → 100% → full marks, always.
  *   • This score is the guaranteed minimum the student can never score below.
  *
- * Stage 2 — Semantic / AI
- *   Scores using TF-IDF cosine similarity, Jaccard, edit-distance, and
- *   anchor-concept coverage — mirrors the Python Random-Forest pipeline.
+ * Stage 2 — Paper's Grading Method  (PMC12171532)
+ *   "Automated grading using NLP and semantic analysis" — Ahmad Ayaan & Kok-Why Ng
+ *   Implements the exact published equations:
+ *     Cnlp = min(max(0, wj·Sj + we·Se + wc·Sc + ww·Sw), 1)          ...(a)
+ *     C    = min(max(0, wtf·Stf + (1-wtf)·Cnlp), 1)                  ...(b)
+ *     F    = { 0  if Stf < 0.2                                        ...(c)
+ *            { 1  if Stf >= 0.9 AND Sw >= 0.85
+ *            { C  otherwise
+ *     M    = ceil(min(F · T, T))                                       ...(d)
+ *   Weights: Jaccard=0.15, EditSim=0.05, Cosine=0.15, NormWC=0.15, Semantic=0.50
  *
- * Final Score = max(stage1, stage2)
- *   The AI score can be higher than the rule-based score (semantic bonus),
- *   but it can NEVER be lower — rule-based acts as a safety floor.
+ * Final Score = min(maxScore, stage1 + stage2)
+ *   The paper grade can only raise the bar — rule-based acts as a floor.
  */
 
 // ─────────────────────────────────────────────────────────────
@@ -249,40 +255,76 @@ function ruleBasedScore(referenceAnswer, studentAnswer, maxScore = 5) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 7B. STAGE 2 — SEMANTIC / AI SCORE
-// RF feature importances: anchors_covered 35%, avg_semantic 30%,
-// max_semantic 18%, avg_jaccard 10%, avg_edit 7%
+// 7B. STAGE 2 — PAPER'S GRADING METHOD  (PMC12171532)
+// "Automated grading using NLP and semantic analysis"
+// Ahmad Ayaan & Kok-Why Ng
 // ─────────────────────────────────────────────────────────────
 
-const WEIGHTS = {
-    feat_anchors_covered: 0.35,
-    feat_avg_semantic: 0.30,
-    feat_max_semantic: 0.18,
-    feat_avg_jaccard: 0.10,
-    feat_avg_edit: 0.07,
-};
+/**
+ * normalizedWordCount(ref, stu)
+ * Sw = reference_keywords / student_keywords, capped at 1.
+ * Paper: "calculated by dividing the sample answer's keywords
+ *         by the student's answer's keywords."
+ */
+function normalizedWordCount(referenceAnswer, studentAnswer) {
+    const refKw = tokenizeFiltered(referenceAnswer);
+    const stuKw = tokenizeFiltered(studentAnswer);
+    if (stuKw.length === 0) return 0;
+    return Math.min(1.0, refKw.length / stuKw.length);
+}
 
-function semanticScore(features, maxScore = 5) {
-    const raw =
-        WEIGHTS.feat_anchors_covered * features.feat_anchors_covered +
-        WEIGHTS.feat_avg_semantic * features.feat_avg_semantic +
-        WEIGHTS.feat_max_semantic * features.feat_max_semantic +
-        WEIGHTS.feat_avg_jaccard * features.feat_avg_jaccard +
-        WEIGHTS.feat_avg_edit * features.feat_avg_edit;
-    return Math.max(0, Math.min(maxScore, raw * maxScore));
+/**
+ * paperGradingScore(ref, stu, maxScore)
+ *
+ * Implements the EXACT equations from the paper:
+ *   Weights: wj=0.15, we=0.05, wc=0.15, ww=0.15, wtf=0.50
+ *
+ *   Cnlp = min(max(0, wj·Sj + we·Se + wc·Sc + ww·Sw), 1)     ...(a)
+ *   C    = min(max(0, wtf·Stf + (1-wtf)·Cnlp), 1)             ...(b)
+ *   F    = { 0  if Stf < 0.2                                   ...(c)
+ *          { 1  if Stf >= 0.9 AND Sw >= 0.85
+ *          { C  otherwise
+ *   M    = ceil(min(F · T, T))                                  ...(d)
+ *
+ * Returns F * maxScore (float) for additive combination with stage 1.
+ * Note: Stf uses TF-IDF cosine as a surrogate for Universal Sentence Encoder.
+ */
+function paperGradingScore(referenceAnswer, studentAnswer, maxScore = 5) {
+    if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
+
+    const Sj = jaccardSimilarity(referenceAnswer, studentAnswer);    // wj = 0.15
+    const Se = editSimilarity(referenceAnswer, studentAnswer);        // we = 0.05
+    const Sc = tfidfCosineSim(referenceAnswer, studentAnswer);        // wc = 0.15
+    const Sw = normalizedWordCount(referenceAnswer, studentAnswer);   // ww = 0.15
+    const Stf = tfidfCosineSim(referenceAnswer, studentAnswer);        // wtf= 0.50 (USE proxy)
+
+    // Equation (a): Combined NLP base score
+    const Cnlp = Math.min(1.0, Math.max(0.0, 0.15 * Sj + 0.05 * Se + 0.15 * Sc + 0.15 * Sw));
+
+    // Equation (b): Confidence score
+    const C = Math.min(1.0, Math.max(0.0, 0.50 * Stf + 0.50 * Cnlp));
+
+    // Equation (c): Threshold rules
+    let F;
+    if (Stf < 0.2) F = 0.0;
+    else if (Stf >= 0.9 && Sw >= 0.85) F = 1.0;
+    else F = C;
+
+    // Return F * maxScore (equation d uses ceil for integer marks;
+    // we return float so the additive logic can apply it smoothly)
+    return F * maxScore;
 }
 
 // ─────────────────────────────────────────────────────────────
-// 7C. FINAL SCORE = max(stage1_rule, stage2_semantic)
-// The semantic AI score can only RAISE the bar, never lower it.
+// 7C. FINAL SCORE = min(maxScore, stage1 + stage2)
+// Rule-based sets the floor; paper method adds semantic credit.
 // ─────────────────────────────────────────────────────────────
 
 function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
     const stage1 = ruleBasedScore(referenceAnswer, studentAnswer, maxScore);
-    const stage2 = semanticScore(features, maxScore);
-    const stage3 = tfidfCosineSim(referenceAnswer, studentAnswer) * maxScore;
-    const final = Math.min(maxScore, stage1 + stage2 + stage3);
-    return { stage1, stage2, stage3, final };
+    const stage2 = paperGradingScore(referenceAnswer, studentAnswer, maxScore);
+    const final = Math.min(maxScore, stage1 + stage2);
+    return { stage1, stage2, final };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -398,9 +440,9 @@ function generateExplanation(scoreObj, features, shapVals, maxScore = 5) {
  * gradeAnswer(ref, student, maxScore)
  *
  * Returns:
- *   scoreObj  = { stage1 (rule-based), stage2 (semantic AI), final (max of both) }
- *   features  = raw feature values
- *   shap      = per-feature SHAP-style attributions
+ *   scoreObj    = { stage1 (rule-based floor), stage2 (paper NLP+semantic), final }
+ *   features    = raw NLP feature values
+ *   shap        = per-feature SHAP-style attributions
  *   explanation = plain-English object { sections[], tips[] }
  */
 function gradeAnswer(referenceAnswer, studentAnswer, maxScore = 5) {
@@ -413,5 +455,5 @@ function gradeAnswer(referenceAnswer, studentAnswer, maxScore = 5) {
 
 // Export for use as module OR global (GitHub Pages = global)
 if (typeof module !== 'undefined') {
-    module.exports = { gradeAnswer, ruleBasedScore, semanticScore, computeFeatures, shapValues, generateExplanation };
+    module.exports = { gradeAnswer, ruleBasedScore, paperGradingScore, normalizedWordCount, computeFeatures, shapValues, generateExplanation };
 }
