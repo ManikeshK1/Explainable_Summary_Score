@@ -4,45 +4,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Explainable Summary Score — AI-Powered Short Answer Grader</title>
+  <title>ExplainGrade — Explainable Short Answer Grading System</title>
   <meta name="description"
-    content="Explainable, AI-powered short answer grading. Get your score, understand why you got it, and learn how to improve — all in plain English." />
-
-  <!-- Fonts & Styles -->
+    content="An explainable automated short-answer grading system combining rule-based scoring, NLP similarity metrics, and sentence-level attribution feedback inspired by ExASAG (BEA 2023)." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Favicon -->
   <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>" />
 </head>
 
 <body>
 
-  <!-- ═══════════════════════════════════════════
-     NAVBAR
-═══════════════════════════════════════════ -->
+  <!-- ═══ NAVBAR ═══ -->
   <nav class="navbar" id="navbar">
-    <a class="navbar__logo" href="#">🧠 ESS</a>
+    <a class="navbar__logo" href="#">🔬 ExplainGrade</a>
     <ul class="navbar__links">
-      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#pipeline">Pipeline</a></li>
       <li><a href="#demo">Live Demo</a></li>
       <li><a href="#batch">Batch Grade</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="#about">Research</a></li>
     </ul>
     <div class="navbar__actions">
       <a class="btn btn--ghost btn--sm" href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank"
-        rel="noopener">
-        ⭐ GitHub
-      </a>
+        rel="noopener">⭐ GitHub</a>
       <button class="theme-toggle" id="theme-toggle" title="Toggle dark / light mode">☀️</button>
     </div>
   </nav>
 
-  <!-- ═══════════════════════════════════════════
-     HERO
-═══════════════════════════════════════════ -->
+  <!-- ═══ HERO ═══ -->
   <section class="hero" id="hero">
     <div class="hero__bg">
       <div class="hero__grid"></div>
@@ -54,33 +47,34 @@
     <div class="container">
       <div class="hero__content">
         <div class="hero__tag">
-          🔬 Research-grade · Open Source · Fully Explainable
+          🎓 NLP Research · Explainable AI · Open Source
         </div>
 
         <h1 class="hero__title">
-          AI Grading That<br />
-          <span class="grad">Actually Explains Itself</span>
+          Short Answer Grading<br />
+          <span class="grad">That Shows Its Work</span>
         </h1>
 
         <p class="hero__subtitle">
-          Upload your answer. Get a score. Understand <em>exactly</em> why — in plain English, not jargon.
-          Built on KeyBERT, Semantic Mapping, and SHAP explainability.
+          An automated grading system inspired by <strong>ExASAG (BEA 2023)</strong> and
+          <strong>PMC12171532</strong>. Grades student answers using a two-stage pipeline —
+          rule-based floor + NLP similarity scoring — then explains <em>exactly</em> which
+          sentences and concepts drove the grade.
         </p>
 
         <div class="hero__cta">
-          <a href="#demo" class="btn btn--primary btn--lg">
-            🚀 Try Live Demo
-          </a>
-          <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" class="btn btn--ghost btn--lg"
-            target="_blank" rel="noopener">
-            View Source
-          </a>
+          <a href="#demo" class="btn btn--primary btn--lg">🚀 Try Live Demo</a>
+          <a href="#pipeline" class="btn btn--ghost btn--lg">How It Works</a>
         </div>
 
         <div class="hero__stats">
           <div class="hero__stat">
+            <div class="hero__stat-value">2</div>
+            <div class="hero__stat-label">Scoring Stages</div>
+          </div>
+          <div class="hero__stat">
             <div class="hero__stat-value">5</div>
-            <div class="hero__stat-label">Explainable Features</div>
+            <div class="hero__stat-label">NLP Metrics</div>
           </div>
           <div class="hero__stat">
             <div class="hero__stat-value">2,200+</div>
@@ -88,99 +82,139 @@
           </div>
           <div class="hero__stat">
             <div class="hero__stat-value">100%</div>
-            <div class="hero__stat-label">Runs In Your Browser</div>
-          </div>
-          <div class="hero__stat">
-            <div class="hero__stat-value">0</div>
-            <div class="hero__stat-label">Data Sent to Any Server</div>
+            <div class="hero__stat-label">Runs In Browser</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-     HOW IT WORKS
-═══════════════════════════════════════════ -->
-  <section class="section how-it-works" id="how-it-works">
+  <!-- ═══ PIPELINE ═══ -->
+  <section class="section" id="pipeline">
     <div class="container">
       <div class="section-title appear">
-        <span class="badge">Pipeline</span>
-        <h2>How It Works</h2>
-        <p>Three stages transform a student's raw text into an explainable, defensible score.</p>
+        <span class="badge">Architecture</span>
+        <h2>Two-Stage Grading Pipeline</h2>
+        <p>Transparent by design — every point is traceable to a specific text comparison.</p>
       </div>
 
+      <!-- Visual pipeline flow -->
       <div class="pipeline appear">
         <div class="pipeline-step">
-          <div class="pipeline-step__icon">
-            ⚓
-            <span class="pipeline-step__num">1</span>
-          </div>
-          <h3>Anchor Extraction</h3>
-          <p>KeyBERT extracts the top 5 key concepts (anchors) from the reference answer using TF-IDF scored keyphrases
-            — unigrams, bigrams, and trigrams.</p>
+          <div class="pipeline-step__icon">⚖️<span class="pipeline-step__num">1</span></div>
+          <h3>Rule-Based Floor</h3>
+          <p>Counts what fraction of the reference's content words and key bigrams appear in the student answer.
+            This sets a guaranteed minimum — students cannot score <em>below</em> what they literally wrote.</p>
+          <div class="pipeline-step__detail">Word Recall + Bigram Bonus</div>
         </div>
 
-        <div class="pipeline-step">
-          <div class="pipeline-step__icon">
-            🗺️
-            <span class="pipeline-step__num">2</span>
-          </div>
-          <h3>Semantic Mapping</h3>
-          <p>The student's answer is compared against each anchor via semantic similarity (sentence embeddings), Jaccard
-            word overlap, and edit-distance phrasing match.</p>
-        </div>
+        <div class="pipeline-arrow">→</div>
 
         <div class="pipeline-step">
-          <div class="pipeline-step__icon">
-            📊
-            <span class="pipeline-step__num">3</span>
-          </div>
-          <h3>Score + Explain</h3>
-          <p>A Random Forest model (trained on the Mohler dataset) predicts the score. SHAP values attribute each
-            feature's contribution so every point gained or lost is explained.</p>
+          <div class="pipeline-step__icon">📐<span class="pipeline-step__num">2</span></div>
+          <h3>NLP Similarity Grade</h3>
+          <p>Four surface metrics (Jaccard, Edit, Cosine, Normalized Word Count) combine into
+            <strong>C<sub>nlp</sub></strong>, then blended 50/50 with semantic similarity
+            <strong>S<sub>tf</sub></strong>
+            following the exact equations from Ahmad Ayaan & Ng (2024).
+          </p>
+          <div class="pipeline-step__detail">C = 0.5·S<sub>tf</sub> + 0.5·C<sub>nlp</sub></div>
+        </div>
+
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">💬<span class="pipeline-step__num">3</span></div>
+          <h3>Sentence Attribution</h3>
+          <p>Inspired by <strong>ExASAG (BEA 2023)</strong> — each sentence in the student's answer is scored
+            independently. The system surfaces which sentences were your strongest and which dragged your score down.
+          </p>
+          <div class="pipeline-step__detail">Sentence-Level Attributions (SLA)</div>
         </div>
       </div>
 
-      <!-- Feature detail cards -->
-      <div class="grid-3" style="margin-top:56px;">
-        <div class="card appear">
-          <div class="feature-card__icon">🎯</div>
-          <h3>Key Concept Coverage</h3>
-          <p>Measures what fraction of the anchor concepts from the ideal answer appear in your response. The single
-            most important factor.</p>
+      <!-- Metric weight cards -->
+      <div class="section-title appear" style="margin-top:64px;">
+        <span class="badge">Metrics</span>
+        <h2>NLP Grading Metrics</h2>
+        <p>Exact weights from PMC12171532 — every number is from the published paper.</p>
+      </div>
+
+      <div class="metrics-grid appear">
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>tf</sub></div>
+          <div class="metric-card__weight" style="color:#a78bfa">50%</div>
+          <div class="metric-card__name">Semantic Similarity</div>
+          <div class="metric-card__desc">TF cosine similarity of full answer vectors — proxy for Universal Sentence
+            Encoder (USE) from the paper</div>
         </div>
-        <div class="card appear">
-          <div class="feature-card__icon">🧬</div>
-          <h3>Semantic Similarity</h3>
-          <p>Captures meaning beyond exact words — your answer can use synonyms and still score well if the underlying
-            idea matches.</p>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>j</sub></div>
+          <div class="metric-card__weight" style="color:#38bdf8">15%</div>
+          <div class="metric-card__name">Jaccard Similarity</div>
+          <div class="metric-card__desc">Token-set intersection over union — rewards correct vocabulary and key
+            terminology</div>
         </div>
-        <div class="card appear">
-          <div class="feature-card__icon">📝</div>
-          <h3>Vocabulary Overlap</h3>
-          <p>Rewards using the correct domain-specific terminology from the model answer, which is critical in technical
-            subjects.</p>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>c</sub></div>
+          <div class="metric-card__weight" style="color:#34d399">15%</div>
+          <div class="metric-card__name">Cosine Similarity</div>
+          <div class="metric-card__desc">Word-frequency vector cosine angle — captures phrasing and synonym usage</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>w</sub></div>
+          <div class="metric-card__weight" style="color:#fbbf24">15%</div>
+          <div class="metric-card__name">Normalized Word Count</div>
+          <div class="metric-card__desc">ref keywords ÷ student keywords — penalises very short or off-topic answers
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>e</sub></div>
+          <div class="metric-card__weight" style="color:#f87171">5%</div>
+          <div class="metric-card__name">Edit Similarity</div>
+          <div class="metric-card__desc">Normalized Levenshtein — catches typos and phrasing variations at character
+            level</div>
+        </div>
+      </div>
+
+      <!-- Scoring equations box -->
+      <div class="equation-box appear">
+        <div class="equation-box__title">📋 Exact Scoring Equations (PMC12171532)</div>
+        <div class="equation-box__body">
+          <div class="eq-row">
+            <span class="eq-label">(a) Base NLP Score</span>
+            <code>C<sub>nlp</sub> = min(max(0, 0.15·S<sub>j</sub> + 0.05·S<sub>e</sub> + 0.15·S<sub>c</sub> + 0.15·S<sub>w</sub>), 1)</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(b) Confidence Score</span>
+            <code>C = min(max(0, 0.5·S<sub>tf</sub> + 0.5·C<sub>nlp</sub>), 1)</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(c) Final Score Rule</span>
+            <code>F = 0 if S<sub>tf</sub>&lt;0.2 &nbsp;|&nbsp; 1 if S<sub>tf</sub>≥0.9 &amp; S<sub>w</sub>≥0.85 &nbsp;|&nbsp; C otherwise</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(d) Stage 2 Score</span>
+            <code>Stage2 = F × MaxMarks &nbsp;&nbsp; Final = min(MaxMarks, Stage1 + Stage2)</code>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-     LIVE DEMO
-═══════════════════════════════════════════ -->
+  <!-- ═══ LIVE DEMO ═══ -->
   <section class="section demo" id="demo">
     <div class="container">
       <div class="section-title appear">
         <span class="badge">Live Demo</span>
-        <h2>Grade Any Answer Instantly</h2>
-        <p>Paste a reference answer and a student response — get a full explainable score in seconds.</p>
+        <h2>Grade Any Answer — Instantly</h2>
+        <p>All computation runs in your browser. Zero data is sent to any server.</p>
       </div>
 
       <div class="demo__layout">
         <!-- Input Form -->
         <div class="card appear" style="align-self:start">
-          <h3 style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+          <h3 style="margin-bottom:20px;display:flex;align-items:center;gap:10px;">
             ✍️ Enter Answers
             <button class="btn btn--ghost btn--sm" id="try-sample" style="margin-left:auto">Try Sample</button>
           </h3>
@@ -205,7 +239,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn--primary" style="width:100%">
+            <button type="submit" class="btn btn--primary" style="width:100%;">
               ⚡ Compute Score &amp; Explanation
             </button>
           </form>
@@ -213,13 +247,11 @@
 
         <!-- Results Panel -->
         <div>
-          <!-- Spinner while computing -->
           <div class="spinner" id="spinner" style="margin:60px auto;"></div>
 
-          <!-- Results -->
           <div class="result-panel" id="result-panel">
 
-            <!-- Score gauge -->
+            <!-- Score display -->
             <div class="score-display" id="score-display">
               <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin-bottom:4px;">
                 <span class="score-display__value" id="score-value">—</span>
@@ -229,48 +261,68 @@
               <div class="score-bar">
                 <div class="score-bar__fill" id="score-bar-fill"></div>
               </div>
-              <!-- Three-stage breakdown rendered by app.js -->
               <div id="stage-breakdown"></div>
             </div>
 
-            <!-- Anchors -->
-            <div class="card appear anchors-display" style="margin-bottom:16px;">
-              <div
-                style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);margin-bottom:10px;">
-                🔑 Extracted Key Concepts (Anchors)
+            <!-- ── Cluster / Coverage Chart ── -->
+            <div class="card appear" style="margin-bottom:16px;" id="cluster-card">
+              <div class="cluster-header">
+                <span style="font-size:1rem;">🗺️</span>
+                <h3>Concept Coverage Map</h3>
+                <span class="part-badge">Visual · Key Concepts</span>
               </div>
-              <div id="anchors-wrap" style="line-height:2.2;"></div>
+              <div class="cluster-subtitle">Each bubble = one key concept extracted from the reference answer.
+                <span style="color:#4ade80">Green</span> = covered in your answer,
+                <span style="color:#f87171">Red</span> = missed.
+                Size = concept importance (TF score).
+              </div>
+              <canvas id="cluster-canvas" width="520" height="220"
+                style="width:100%;max-width:520px;display:block;margin:12px auto 0;"></canvas>
+              <div id="cluster-legend"
+                style="display:flex;gap:18px;justify-content:center;margin-top:10px;font-size:0.8rem;color:var(--text-dim);">
+              </div>
             </div>
 
-            <!-- Part 1: Plain English -->
+            <!-- ── Sentence Attribution (ExASAG-style) ── -->
+            <div class="explanation-card appear">
+              <div class="explanation-card__header">
+                <span style="font-size:1.2rem">💬</span>
+                <h3>Sentence-Level Attribution</h3>
+                <span class="part-badge">ExASAG · BEA 2023</span>
+              </div>
+              <div class="exasag-info">
+                Inspired by ExASAG (Filighera et al., BEA 2023) — each sentence in your answer is scored
+                independently. <span style="color:#4ade80">■</span> Strong sentences pushed your score up.
+                <span style="color:#f87171">■</span> Weak sentences pulled it down.
+              </div>
+              <div id="sentence-attribution-body"></div>
+            </div>
+
+            <!-- ── Plain English Explanation ── -->
             <div class="explanation-card appear">
               <div class="explanation-card__header">
                 <span style="font-size:1.2rem">📝</span>
                 <h3>What This Score Means</h3>
                 <span class="part-badge">Part 1 · Plain English</span>
               </div>
-              <div class="explanation-card__body" id="explanation-body">
-                <!-- Rendered by app.js -->
-              </div>
+              <div class="explanation-card__body" id="explanation-body"></div>
             </div>
 
-            <!-- Part 2: SHAP -->
+            <!-- ── SHAP Attribution bars ── -->
             <div class="shap-card appear">
               <div class="shap-card__header">
                 <span style="font-size:1.2rem">📊</span>
-                <h3>Feature Attributions</h3>
+                <h3>Metric Attributions</h3>
                 <span class="part-badge"
                   style="background:rgba(0,212,255,0.1);color:var(--accent2);border-color:rgba(0,212,255,0.2);">
-                  Part 2 · SHAP Values
+                  Part 2 · Feature Impact
                 </span>
               </div>
-              <div class="shap-card__body" id="shap-body">
-                <!-- Rendered by app.js -->
-              </div>
+              <div class="shap-card__body" id="shap-body"></div>
               <div
                 style="padding:12px 24px;font-size:0.78rem;color:var(--text-dim);border-top:1px solid var(--border-soft);">
-                ▲ Green bars raise your score above the average student baseline &nbsp;·&nbsp;
-                ▼ Red bars lower it. Hover rows for details.
+                ▲ Green bars = metric boosted your score above average &nbsp;·&nbsp;
+                ▼ Red bars = metric pulled score below average. Hover for details.
               </div>
             </div>
 
@@ -280,21 +332,19 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-     BATCH GRADING
-═══════════════════════════════════════════ -->
+  <!-- ═══ BATCH GRADING ═══ -->
   <section class="section batch" id="batch">
     <div class="container">
       <div class="section-title appear">
         <span class="badge">Batch Mode</span>
         <h2>Grade an Entire Class at Once</h2>
-        <p>Upload a CSV with reference and student answers — get scores and explanations for every row.</p>
+        <p>Upload a CSV — get scores for every row in seconds, entirely in-browser.</p>
       </div>
 
       <div class="csv-hint appear">
         Required CSV columns (flexible name matching):
         <code>question</code> &nbsp;
-        <code>desired_answer</code> (or <em>reference_answer</em> / <em>ideal_answer</em>) &nbsp;
+        <code>desired_answer</code> (or <em>reference_answer / ideal_answer</em>) &nbsp;
         <code>student_answer</code> (or <em>response</em>)
         — matches the Mohler dataset format directly.
       </div>
@@ -302,8 +352,7 @@
       <div class="upload-zone appear" id="upload-zone">
         <div class="upload-zone__icon">📂</div>
         <h3>Drop your CSV here, or click to browse</h3>
-        <p>Supports the Mohler dataset format out-of-the-box.</p>
-        <br />
+        <p>Supports the Mohler dataset format out-of-the-box.</p><br />
         <button class="btn btn--primary btn--sm"
           onclick="event.stopPropagation(); document.getElementById('batch-file-input').click()">
           Choose File
@@ -312,137 +361,137 @@
       </div>
 
       <div id="batch-progress" class="hidden" style="text-align:center;padding:20px;color:var(--text-muted);"></div>
-
       <div id="batch-results" class="hidden">
         <div id="batch-table-wrap"></div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-     ABOUT
-═══════════════════════════════════════════ -->
+  <!-- ═══ RESEARCH / ABOUT ═══ -->
   <section class="section about" id="about">
     <div class="container">
       <div class="section-title appear">
-        <span class="badge">About</span>
-        <h2>The Research Behind It</h2>
+        <span class="badge">Research</span>
+        <h2>The Research Behind ExplainGrade</h2>
       </div>
 
       <div class="grid-2">
         <div class="card appear">
-          <h3 style="margin-bottom:14px;">🎓 Project Background</h3>
-          <p style="margin-bottom:14px;">
-            This system is built on the <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark corpus of
-            student responses to computer science questions, each graded on a 0–5 scale by human annotators.
+          <h3 style="margin-bottom:14px;">🎓 Project Overview</h3>
+          <p style="margin-bottom:12px;">
+            <strong>ExplainGrade</strong> is an automated short-answer grading (ASAG) system built on two
+            published research works and the <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark
+            of 2,273 student responses to Computer Science questions, graded 0–5 by human annotators.
           </p>
-          <p style="margin-bottom:14px;">
-            The pipeline addresses the twin problems of <em>length-bias noise</em> and <em>black-box scoring</em> by
-            anchoring the score to specific, extractable concepts rather than surface-level text statistics.
+          <p style="margin-bottom:12px;">
+            The system addresses the twin problems present in ASAG: <em>length-bias noise</em> (longer answers
+            get artificially inflated scores) and <em>black-box scoring</em> (students receive no actionable
+            feedback). By anchoring every grade to specific, measurable NLP comparisons, every point is
+            traceable.
           </p>
           <p>
-            SHAP (SHapley Additive exPlanations) values are used to decompose the Random Forest prediction into
-            per-feature contributions, ensuring every point gained or lost can be traced back to a concrete
-            aspect of the student's answer.
+            The explanation layer is directly inspired by <strong>ExASAG</strong> (Filighera et al., BEA 2023),
+            which introduces sentence-level attributions (SLA) — rating individual sentences in the student's
+            response for their contribution to the final grade, giving students precise, actionable feedback.
           </p>
         </div>
 
         <div class="card appear">
+          <h3 style="margin-bottom:14px;">📄 Key References</h3>
+          <div class="ref-list">
+            <div class="ref-item">
+              <div class="ref-num">1</div>
+              <div>
+                <strong>Ahmad Ayaan &amp; Kok-Why Ng (2024)</strong><br />
+                <em>Automated grading using natural language processing and semantic analysis.</em>
+                PMC12171532. — Source of the NLP metric weights and scoring equations used in Stage 2.
+              </div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-num">2</div>
+              <div>
+                <strong>Filighera et al. (2023)</strong><br />
+                <em>Our System for Short Answer Grading using Generative Models.</em>
+                BEA Workshop, ACL 2023. — Source of the sentence-level attribution (SLA) explanation framework.
+              </div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-num">3</div>
+              <div>
+                <strong>Mohler et al. (2011)</strong><br />
+                <em>Learning to grade short answer questions using semantic similarity measures
+                  and dependency graph alignments.</em> ACL. — Dataset used for training and evaluation.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card appear" style="grid-column:1/-1;">
           <h3 style="margin-bottom:14px;">🛠 Tech Stack</h3>
           <div class="tech-stack">
             <span class="tech-tag">Python 3.12</span>
             <span class="tech-tag">scikit-learn RF</span>
             <span class="tech-tag">KeyBERT</span>
             <span class="tech-tag">sentence-transformers</span>
-            <span class="tech-tag">SHAP</span>
             <span class="tech-tag">all-MiniLM-L6-v2</span>
+            <span class="tech-tag">Levenshtein</span>
+            <span class="tech-tag">SHAP</span>
             <span class="tech-tag">pandas / numpy</span>
+            <span class="tech-tag">TF Cosine Sim</span>
+            <span class="tech-tag">Jaccard Similarity</span>
             <span class="tech-tag">HTML5 / CSS3</span>
             <span class="tech-tag">Vanilla JS</span>
             <span class="tech-tag">PapaParse</span>
+            <span class="tech-tag">Canvas API</span>
             <span class="tech-tag">GitHub Pages</span>
-            <span class="tech-tag">Levenshtein</span>
-            <span class="tech-tag">TF-IDF Cosine</span>
           </div>
-
           <div class="divider"></div>
-
-          <h3 style="margin-bottom:14px;">📄 References</h3>
-          <ul style="padding-left:18px; font-size:0.88rem; color:var(--text-muted);">
-            <li style="margin-bottom:8px;">Mohler et al. (2011). <em>Learning to grade short answer questions using
-                semantic similarity measures and dependency graph alignments.</em> ACL.</li>
-            <li style="margin-bottom:8px;">Saha et al. (2023). <em>System for short-answer grading using generative
-                models.</em> BEA Workshop, ACL 2023.</li>
-            <li>Lundberg &amp; Lee (2017). <em>A unified approach to interpreting model predictions.</em> NeurIPS.</li>
-          </ul>
-        </div>
-
-        <div class="card appear" style="grid-column:1/-1;">
-          <h3 style="margin-bottom:14px;">📊 Feature Descriptions</h3>
+          <h3 style="margin-bottom:14px;">📊 NLP Metric Reference</h3>
           <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
               <thead>
                 <tr>
-                  <th
-                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
-                    Feature</th>
-                  <th
-                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
-                    What It Measures</th>
-                  <th
-                    style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-soft);color:var(--text-dim);font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.05em;">
-                    RF Weight</th>
+                  <th class="tbl-th">Symbol</th>
+                  <th class="tbl-th">Metric</th>
+                  <th class="tbl-th">Weight</th>
+                  <th class="tbl-th">What It Measures</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_anchors_covered</code>
-                  </td>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
-                    Fraction of key-concept anchors from the ideal answer that the student addressed (threshold 0.35
-                    cosine)</td>
-                  <td
-                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
-                    35%</td>
+                  <td class="tbl-td"><code>S<sub>tf</sub></code></td>
+                  <td class="tbl-td">Semantic Similarity</td>
+                  <td class="tbl-td" style="color:var(--primary);font-weight:700;">50%</td>
+                  <td class="tbl-td" style="color:var(--text-muted);">TF cosine of full answer vectors — proxy for
+                    Universal Sentence Encoder contextual meaning</td>
                 </tr>
                 <tr>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_avg_semantic</code>
-                  </td>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
-                    Average cosine similarity between the student answer embedding and each anchor embedding</td>
-                  <td
-                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
-                    30%</td>
+                  <td class="tbl-td"><code>S<sub>j</sub></code></td>
+                  <td class="tbl-td">Jaccard Similarity</td>
+                  <td class="tbl-td" style="color:var(--primary);font-weight:700;">15%</td>
+                  <td class="tbl-td" style="color:var(--text-muted);">Token-set intersection/union — rewards correct
+                    domain vocabulary and key terms</td>
                 </tr>
                 <tr>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_max_semantic</code>
-                  </td>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">Best
-                    (maximum) cosine similarity score across all anchor comparisons — captures the student's strongest
-                    matching phrase</td>
-                  <td
-                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
-                    18%</td>
+                  <td class="tbl-td"><code>S<sub>c</sub></code></td>
+                  <td class="tbl-td">Cosine Similarity</td>
+                  <td class="tbl-td" style="color:var(--primary);font-weight:700;">15%</td>
+                  <td class="tbl-td" style="color:var(--text-muted);">Word-frequency vector angle — captures synonym use
+                    and varied phrasing</td>
                 </tr>
                 <tr>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);">
-                    <code>feat_avg_jaccard</code>
-                  </td>
-                  <td style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--text-muted);">
-                    Average Jaccard word-set overlap between the student answer and each anchor — rewards correct
-                    terminology</td>
-                  <td
-                    style="padding:10px 14px;border-bottom:1px solid var(--border-soft);color:var(--primary);font-weight:700;">
-                    10%</td>
+                  <td class="tbl-td"><code>S<sub>w</sub></code></td>
+                  <td class="tbl-td">Norm. Word Count</td>
+                  <td class="tbl-td" style="color:var(--primary);font-weight:700;">15%</td>
+                  <td class="tbl-td" style="color:var(--text-muted);">ref keywords ÷ student keywords — prevents length
+                    inflation bias</td>
                 </tr>
                 <tr>
-                  <td style="padding:10px 14px;"><code>feat_avg_edit</code></td>
-                  <td style="padding:10px 14px;color:var(--text-muted);">Average normalised Levenshtein similarity —
-                    captures phrasing closeness beyond word-level comparison</td>
-                  <td style="padding:10px 14px;color:var(--primary);font-weight:700;">7%</td>
+                  <td class="tbl-td"><code>S<sub>e</sub></code></td>
+                  <td class="tbl-td">Edit Similarity</td>
+                  <td class="tbl-td" style="color:var(--primary);font-weight:700;">5%</td>
+                  <td class="tbl-td" style="color:var(--text-muted);">Normalised Levenshtein — character-level phrasing
+                    similarity for typo tolerance</td>
                 </tr>
               </tbody>
             </table>
@@ -452,31 +501,22 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════ -->
+  <!-- ═══ FOOTER ═══ -->
   <footer class="footer">
     <div class="container">
       <p>
-        Built with ❤️ by
-        <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener">ManikeshK1</a>
+        Built by <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener">ManikeshK1</a>
         &nbsp;·&nbsp;
         <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank" rel="noopener">GitHub</a>
-        &nbsp;·&nbsp;
-        All scoring runs locally in your browser — no data is sent anywhere.
+        &nbsp;·&nbsp; All scoring runs locally — no data leaves your browser.
       </p>
     </div>
   </footer>
 
-  <!-- ── Toast notification ─────────────────── -->
   <div class="toast" id="toast"></div>
 
-  <!-- ── Scripts (CDN first, then ours) ────── -->
-  <!-- PapaParse: CSV parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <!-- Our scoring engine (must load before app.js) -->
   <script src="scorer.js"></script>
-  <!-- Our UI controller -->
   <script src="app.js"></script>
 
 </body>
