@@ -26,6 +26,8 @@
       <li><a href="#pipeline">Pipeline</a></li>
       <li><a href="#demo">Live Demo</a></li>
       <li><a href="#batch">Batch Grade</a></li>
+      <li><a href="#demo">Live Demo</a></li>
+      <li><a href="#script-eval">Script Eval</a></li>
       <li><a href="#about">Research</a></li>
     </ul>
     <div class="navbar__actions">
@@ -332,8 +334,8 @@
     </div>
   </section>
 
-  <!-- ═══ BATCH GRADING ═══ -->
-  <section class="section batch" id="batch">
+  <!-- ═══ BATCH GRADING (CSV) ═══ -->
+  <section class="section batch" id="batch" style="display:none;">
     <div class="container">
       <div class="section-title appear">
         <span class="badge">Batch Mode</span>
@@ -363,6 +365,67 @@
       <div id="batch-progress" class="hidden" style="text-align:center;padding:20px;color:var(--text-muted);"></div>
       <div id="batch-results" class="hidden">
         <div id="batch-table-wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SCRIPT EVALUATION ═══ -->
+  <section class="section batch" id="script-eval">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Class Evaluation</span>
+        <h2>Evaluate Student Summaries vs Meet Transcript</h2>
+        <p>Upload your Google Meet Transcript (.docx) and Student Summaries (.xlsx). The system will automatically
+          refine the transcript into a reference answer and grade each student.</p>
+      </div>
+
+      <div class="grid-2 appear">
+        <div class="upload-zone" id="script-upload-zone" style="min-height:200px;">
+          <div class="upload-zone__icon">📄</div>
+          <h3>1. Upload Teacher Script</h3>
+          <p>Provide the Google Meet transcript (.docx)</p><br />
+          <button class="btn btn--ghost btn--sm"
+            onclick="event.stopPropagation(); document.getElementById('script-file-input').click()">
+            Choose .docx File
+          </button>
+          <input type="file" id="script-file-input" accept=".docx" style="display:none;" />
+          <div id="script-file-name" style="margin-top:10px;font-size:0.9rem;color:var(--primary);"></div>
+        </div>
+
+        <div class="upload-zone" id="summary-upload-zone" style="min-height:200px;">
+          <div class="upload-zone__icon">📊</div>
+          <h3>2. Upload Student Summaries</h3>
+          <p>Must contain columns: emailAddress, name, summary (.xlsx)</p><br />
+          <button class="btn btn--ghost btn--sm"
+            onclick="event.stopPropagation(); document.getElementById('summary-file-input').click()">
+            Choose .xlsx File
+          </button>
+          <input type="file" id="summary-file-input" accept=".xlsx" style="display:none;" />
+          <div id="summary-file-name" style="margin-top:10px;font-size:0.9rem;color:var(--primary);"></div>
+        </div>
+      </div>
+
+      <div class="appear" style="text-align:center; margin-top:24px;">
+        <button id="run-script-eval-btn" class="btn btn--primary btn--lg" disabled>
+          ⚡ Run Evaluation
+        </button>
+      </div>
+
+      <div id="script-eval-progress" class="hidden" style="text-align:center;padding:20px;color:var(--text-muted);">
+      </div>
+      <div id="script-eval-results" class="hidden">
+        <!-- Optional: Show the refined script text -->
+        <div class="card" style="margin-bottom: 24px;">
+          <h4 style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span>🧠 Refined Reference Answer (Auto-extracted)</span>
+            <button class="btn btn--ghost btn--sm"
+              onclick="document.getElementById('refined-script-content').classList.toggle('hidden')">Show/Hide</button>
+          </h4>
+          <div id="refined-script-content" class="hidden"
+            style="font-size: 0.9rem; line-height: 1.5; color: var(--text-muted); max-height: 200px; overflow-y: auto; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+          </div>
+        </div>
+        <div id="script-table-wrap"></div>
       </div>
     </div>
   </section>
@@ -516,6 +579,8 @@
   <div class="toast" id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="node_modules/mammoth/mammoth.browser.min.js"></script>
+  <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
   <script src="scorer.js"></script>
   <script src="app.js"></script>
 

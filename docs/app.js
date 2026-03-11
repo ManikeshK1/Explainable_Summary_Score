@@ -615,3 +615,316 @@ document.getElementById('try-sample')?.addEventListener('click', () => {
     document.getElementById('max-score').value = '5';
     document.getElementById('ref-answer').scrollIntoView({ behavior: 'smooth' });
 });
+
+// ─────────────────────────────────────────
+// CLASS EVALUATION (Script + Summaries)
+// ─────────────────────────────────────────
+
+let uploadedScriptText = null;
+let uploadedSummaries = null;
+
+const scriptInput = document.getElementById('script-file-input');
+const summaryInput = document.getElementById('summary-file-input');
+const scriptFileName = document.getElementById('script-file-name');
+const summaryFileName = document.getElementById('summary-file-name');
+const runEvalBtn = document.getElementById('run-script-eval-btn');
+const evalProgress = document.getElementById('script-eval-progress');
+const evalResults = document.getElementById('script-eval-results');
+const refinedScriptContent = document.getElementById('refined-script-content');
+const scriptTableWrap = document.getElementById('script-table-wrap');
+
+function checkEvalReady() {
+    if (uploadedScriptText && uploadedSummaries) {
+        runEvalBtn.removeAttribute('disabled');
+    } else {
+        runEvalBtn.setAttribute('disabled', 'true');
+    }
+}
+
+// 1. Handle DOCX upload
+scriptInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    scriptFileName.textContent = `File: ${file.name}`;
+
+    if (!file.name.endsWith('.docx')) {
+        showToast('Please upload a .docx file for the script', 'error');
+        return;
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        uploadedScriptText = result.value;
+        showToast('Script loaded successfully');
+        checkEvalReady();
+    } catch (err) {
+        showToast('Error reading .docx: ' + err.message, 'error');
+        console.error(err);
+    }
+});
+
+// 2. Handle XLSX upload
+summaryInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    summaryFileName.textContent = `File: ${file.name}`;
+
+    if (!file.name.endsWith('.xlsx')) {
+        showToast('Please upload an .xlsx file for summaries', 'error');
+        return;
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Parse as JSON array
+        const data = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        uploadedSummaries = data;
+        showToast(`Loaded ${data.length} student summaries`);
+        checkEvalReady();
+    } catch (err) {
+        showToast('Error reading .xlsx: ' + err.message, 'error');
+        console.error(err);
+    }
+});
+
+// Refine the raw Teacher Script (remove names, timestamps, filler) and generate a summary
+function refineTeacherScript(rawText) {
+    const lines = rawText.split('\n');
+    const refined = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) continue;
+
+        // Google Meet formats (heuristics):
+        // Skip timestamps like "18:10", "[00:15]"
+        if (/^\[?\d{1,2}:\d{2}(:\d{2})?\]?$/.test(line)) continue;
+
+        // Skip speaker names (often just followed by timestamp on next line)
+        if (i + 1 < lines.length && /^\[?\d{1,2}:\d{2}(:\d{2})?\]?$/.test(lines[i + 1].trim())) {
+            continue;
+        }
+
+        // Remove inline speakers and timestamps
+        line = line.replace(/^\[?\d{1,2}:\d{2}(:\d{2})?\]?\s*/, '');
+        // Only strip if it matches typical speaker format "Name: "
+        if (line.match(/^[A-Z][a-zA-Z\s]+:/)) {
+            line = line.replace(/^.*?:(.*)/, '$1').trim();
+        }
+
+        // Skip system messages
+        if (line.match(/joined the meeting|left the meeting|Attendees|Agentic AI Class/i)) continue;
+
+        // Skip short filler
+        if (line.split(/\s+/).length < 4 && /^(yes|no|okay|ok|right|yeah|yep|sure|mhmm)\.?$/i.test(line)) {
+            continue;
+        }
+
+        if (line) {
+            refined.push(line);
+        }
+    }
+
+    let cleanText = refined.join(' ');
+
+    // Extractive Summarization: If the transcript is long, extract the most important sentences
+    // This addresses the requirement to "make summary of script" handling lengthy transcripts.
+    const sentences = cleanText.replace(/([.?!])\s*(?=[A-Z0-9])/g, "$1|").split("|").map(s => s.trim()).filter(s => s.length > 5);
+
+    if (sentences.length > 8) {
+        // Extract top keywords/anchors from the entire text to evaluate sentence importance
+        // extractAnchors is available globally from scorer.js
+        const anchors = extractAnchors(cleanText, 25);
+
+        const scoredSentences = sentences.map((sentence, idx) => {
+            const lowerSent = sentence.toLowerCase();
+            let score = 0;
+
+            // +1 for each anchor keyphrase present
+            anchors.forEach(a => {
+                if (lowerSent.includes(a)) score += 1;
+            });
+
+            // Penalize conversational pronouns & filler words (addressing "remove pronouns etc.")
+            const fillerRegex = /\b(i|you|he|she|it|we|they|me|him|her|us|them|um|uh|ah|like|basically|so|well|anyway)\b/gi;
+            const fillerCount = (sentence.match(fillerRegex) || []).length;
+            score -= (fillerCount * 0.5);
+
+            // Slight boost for longer, more descriptive sentences (up to a point)
+            const wordCount = sentence.split(' ').length;
+            if (wordCount > 8 && wordCount < 30) score += 0.5;
+
+            return { index: idx, text: sentence, score: score };
+        });
+
+        // Sort by score (descending) and pick the top 35% of sentences, minimum of 5
+        scoredSentences.sort((a, b) => b.score - a.score);
+        const topCount = Math.max(5, Math.ceil(sentences.length * 0.35));
+        const topSentences = scoredSentences.slice(0, topCount);
+
+        // Restore original chronological order of the selected sentences
+        topSentences.sort((a, b) => a.index - b.index);
+        cleanText = topSentences.map(s => s.text).join(' ');
+    }
+
+    return cleanText;
+}
+
+// Convert explanation JSON to a clean plain text string
+function formatExplanationText(explanation) {
+    if (!explanation || !explanation.sections) return "No explanation available.";
+
+    const parts = explanation.sections
+        .filter(s => !s.sub) // Skip substrings/sub-sections for brevity in table
+        .map(s => {
+            // strip HTML tags like <strong>
+            const plainText = s.text.replace(/<[^>]*>?/gm, '');
+            return s.icon + ' ' + plainText;
+        });
+
+    return parts.join('\n\n');
+}
+
+// 3. Run Evaluation Pipeline
+runEvalBtn?.addEventListener('click', () => {
+    if (!uploadedScriptText || !uploadedSummaries) return;
+
+    evalProgress.classList.remove('hidden');
+    evalResults.classList.add('hidden');
+    evalProgress.textContent = "⏳ Refining teacher script...";
+
+    setTimeout(() => {
+        // Step A: Refine Script
+        const referenceAnswer = refineTeacherScript(uploadedScriptText);
+        refinedScriptContent.textContent = referenceAnswer;
+
+        if (!referenceAnswer || referenceAnswer.length < 20) {
+            evalProgress.classList.add('hidden');
+            showToast("Error: Refined script is too short or empty. Check transcript format.", "error");
+            return;
+        }
+
+        // Output table data
+        let evaluatedData = [];
+        let processed = 0;
+
+        // Identify columns (flexible names)
+        const keys = Object.keys(uploadedSummaries[0] || {});
+        const colEmail = keys.find(k => /email|mail/i.test(k));
+        const colName = keys.find(k => /name/i.test(k));
+        const colSummary = keys.find(k => /summary|answer|response/i.test(k));
+
+        if (!colEmail || !colSummary) {
+            evalProgress.classList.add('hidden');
+            showToast("Error: XLSX must contain 'emailAddress' (or 'email') and 'summary' columns.", "error");
+            return;
+        }
+
+        // Default max score is 5 for the class
+        const maxScoreDefault = 5;
+
+        // Step B: Grade chunks
+        function scoreChunk(start) {
+            const end = Math.min(start + 5, uploadedSummaries.length);
+            for (let i = start; i < end; i++) {
+                const row = uploadedSummaries[i];
+                const stuSummary = (row[colSummary] || "").toString().trim();
+                const email = row[colEmail] || "Unknown";
+                const name = colName ? row[colName] : "N/A";
+
+                if (!stuSummary) {
+                    evaluatedData.push({ email, name, score: 0, rawScore: 0, explanation: "No summary provided." });
+                    processed++;
+                    continue;
+                }
+
+                // Call existing scorer logic
+                const res = gradeAnswer(referenceAnswer, stuSummary, maxScoreDefault);
+                const explanationText = formatExplanationText(res.explanation);
+
+                evaluatedData.push({
+                    email,
+                    name,
+                    rawScore: res.scoreObj.final,
+                    score: res.scoreObj.final.toFixed(2) + " / 5",
+                    explanation: explanationText
+                });
+
+                processed++;
+            }
+
+            evalProgress.textContent = `⏳ Grading... ${processed} / ${uploadedSummaries.length}`;
+
+            if (end < uploadedSummaries.length) {
+                setTimeout(() => scoreChunk(end), 10);
+            } else {
+                renderScriptTable(evaluatedData);
+            }
+        }
+
+        scoreChunk(0);
+    }, 50); // small delay to allow UI to update
+});
+
+function renderScriptTable(data) {
+    evalProgress.classList.add('hidden');
+    evalResults.classList.remove('hidden');
+
+    // Sort by score descending
+    const sorted = [...data].sort((a, b) => b.rawScore - a.rawScore);
+
+    const cols = ['Student Email', 'Name', 'Score', 'Explanation of Grade'];
+
+    scriptTableWrap.innerHTML = `
+      <div class="batch-table-wrap">
+        <table class="batch-table" id="script-eval-tbl">
+          <thead>
+            <tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr>
+          </thead>
+          <tbody>
+            ${sorted.map(row => {
+        const chipClass = scoreColorClass(row.rawScore, 5);
+        return `
+                  <tr>
+                    <td><strong>${row.email}</strong></td>
+                    <td>${row.name}</td>
+                    <td><span class="score-chip ${chipClass}">${row.score}</span></td>
+                    <td style="white-space: pre-line; font-size: 0.85rem; max-width: 400px; line-height: 1.4;">${row.explanation}</td>
+                  </tr>
+                `;
+    }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn--ghost btn--sm" id="export-eval-csv">⬇ Export Results</button>
+      </div>
+    `;
+
+    document.getElementById('export-eval-csv')?.addEventListener('click', () => {
+        const headers = ["Student Email", "Name", "Score", "Explanation of Grade"];
+        const rows = sorted.map(r => [
+            `"${r.email}"`,
+            `"${r.name}"`,
+            r.rawScore.toFixed(3),
+            `"${r.explanation.replace(/"/g, '""')}"`
+        ].join(','));
+
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'class_evaluation_results.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Results exported!');
+    });
+
+    showToast(`Successfully graded ${data.length} students.`);
+}
