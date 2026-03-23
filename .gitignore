@@ -1,0 +1,56 @@
+﻿# Python Environments - DO NOT COMMIT
+venv/
+spacy-env/
+env/
+ENV/
+.venv/
+
+# Python Cache & Build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Node/JS
+node_modules/
+package-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large Binary Files - DO NOT COMMIT
+*.dll
+*.so
+*.pth
+*.whl
+torch_cpu.dll
+
+# Data/Output files - DO NOT COMMIT
+*.xlsx
+grading_results.csv
+Summary.xlsx
+*.docx
+output.txt
+
+# Colab notebooks - local development only
+AI_chat.ipynb
+Agentic*
+"Agentic AI Class"*
+
+# Keep only essential files for website:
+# DO COMMIT: docs/, src/, README.md, package.json, requirements.txt, .gitignore
+# DO COMMIT: Python source files (semantic_mapping.py, anchor_extraction.py, etc.)
+# DO COMMIT: IMPLEMENTATION_SUMMARY.md
