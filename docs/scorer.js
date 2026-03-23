@@ -27,169 +27,27 @@
 // ─────────────────────────────────────────────────────────────
 
 const STOPWORDS = new Set([
-  "a",
-  "an",
-  "the",
-  "is",
-  "are",
-  "was",
-  "were",
-  "be",
-  "been",
-  "being",
-  "have",
-  "has",
-  "had",
-  "do",
-  "does",
-  "did",
-  "will",
-  "would",
-  "could",
-  "should",
-  "may",
-  "might",
-  "shall",
-  "can",
-  "to",
-  "of",
-  "in",
-  "for",
-  "on",
-  "with",
-  "at",
-  "by",
-  "from",
-  "as",
-  "into",
-  "through",
-  "during",
-  "before",
-  "after",
-  "above",
-  "below",
-  "between",
-  "out",
-  "off",
-  "over",
-  "under",
-  "and",
-  "but",
-  "or",
-  "nor",
-  "so",
-  "yet",
-  "both",
-  "either",
-  "neither",
-  "not",
-  "no",
-  "that",
-  "this",
-  "these",
-  "those",
-  "which",
-  "who",
-  "whom",
-  "what",
-  "how",
-  "when",
-  "where",
-  "why",
-  "if",
-  "because",
-  "while",
-  "although",
-  "though",
-  "since",
-  "unless",
-  "until",
-  "than",
-  "i",
-  "you",
-  "he",
-  "she",
-  "it",
-  "we",
-  "they",
-  "me",
-  "him",
-  "her",
-  "us",
-  "them",
-  "my",
-  "your",
-  "his",
-  "its",
-  "our",
-  "their",
-  "mine",
-  "yours",
-  "ours",
-  "theirs",
-  "its",
-  "all",
-  "each",
-  "any",
-  "few",
-  "more",
-  "most",
-  "other",
-  "some",
-  "such",
-  "only",
-  "own",
-  "same",
-  "than",
-  "too",
-  "very",
-  "just",
-  "about",
-  "above",
-  "after",
-  "again",
-  "also",
-  "back",
-  "being",
-  "between",
-  "each",
-  "here",
-  "however",
-  "into",
-  "like",
-  "many",
-  "make",
-  "much",
-  "now",
-  "only",
-  "other",
-  "our",
-  "s",
-  "t",
-  "can",
-  "will",
-  "just",
-  "don",
-  "should",
-  "now",
-  "d",
-  "m",
-  "o",
-  "re",
-  "ve",
-  "y",
+    'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+    'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'shall', 'can',
+    'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through',
+    'during', 'before', 'after', 'above', 'below', 'between', 'out', 'off', 'over', 'under',
+    'and', 'but', 'or', 'nor', 'so', 'yet', 'both', 'either', 'neither', 'not', 'no',
+    'that', 'this', 'these', 'those', 'which', 'who', 'whom', 'what', 'how', 'when', 'where',
+    'why', 'if', 'because', 'while', 'although', 'though', 'since', 'unless', 'until', 'than',
+    'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them', 'my', 'your',
+    'his', 'its', 'our', 'their', 'mine', 'yours', 'ours', 'theirs', 'its', 'all', 'each',
+    'any', 'few', 'more', 'most', 'other', 'some', 'such', 'only', 'own', 'same', 'than', 'too',
+    'very', 'just', 'about', 'above', 'after', 'again', 'also', 'back', 'being', 'between',
+    'each', 'here', 'however', 'into', 'like', 'many', 'make', 'much', 'now', 'only', 'other',
+    'our', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now', 'd', 'm', 'o', 're', 've', 'y'
 ]);
 
 function tokenize(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter((t) => t.length > 1);
+    return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(t => t.length > 1);
 }
 
 function tokenizeFiltered(text) {
-  return tokenize(text).filter((t) => !STOPWORDS.has(t));
+    return tokenize(text).filter(t => !STOPWORDS.has(t));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -197,12 +55,12 @@ function tokenizeFiltered(text) {
 // ─────────────────────────────────────────────────────────────
 
 function jaccardSimilarity(text1, text2) {
-  const set1 = new Set(tokenize(text1));
-  const set2 = new Set(tokenize(text2));
-  if (set1.size === 0 || set2.size === 0) return 0;
-  const intersection = [...set1].filter((t) => set2.has(t)).length;
-  const union = new Set([...set1, ...set2]).size;
-  return intersection / union;
+    const set1 = new Set(tokenize(text1));
+    const set2 = new Set(tokenize(text2));
+    if (set1.size === 0 || set2.size === 0) return 0;
+    const intersection = [...set1].filter(t => set2.has(t)).length;
+    const union = new Set([...set1, ...set2]).size;
+    return intersection / union;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -210,24 +68,22 @@ function jaccardSimilarity(text1, text2) {
 // ─────────────────────────────────────────────────────────────
 
 function editSimilarity(text1, text2) {
-  const a = text1.toLowerCase();
-  const b = text2.toLowerCase();
-  if (!a && !b) return 1;
-  if (!a || !b) return 0;
-  const m = a.length,
-    n = b.length;
-  const dp = Array.from({ length: m + 1 }, (_, i) =>
-    Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
-  );
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      dp[i][j] =
-        a[i - 1] === b[j - 1]
-          ? dp[i - 1][j - 1]
-          : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    const a = text1.toLowerCase();
+    const b = text2.toLowerCase();
+    if (!a && !b) return 1;
+    if (!a || !b) return 0;
+    const m = a.length, n = b.length;
+    const dp = Array.from({ length: m + 1 }, (_, i) =>
+        Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+    );
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            dp[i][j] = a[i - 1] === b[j - 1]
+                ? dp[i - 1][j - 1]
+                : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
     }
-  }
-  return 1 - dp[m][n] / Math.max(m, n);
+    return 1 - dp[m][n] / Math.max(m, n);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -239,43 +95,41 @@ function editSimilarity(text1, text2) {
 // ─────────────────────────────────────────────────────────────
 
 function buildTfVector(tokens) {
-  const freq = {};
-  for (const t of tokens) freq[t] = (freq[t] || 0) + 1;
-  const total = tokens.length || 1;
-  const tf = {};
-  for (const t in freq) tf[t] = freq[t] / total;
-  return tf;
+    const freq = {};
+    for (const t of tokens) freq[t] = (freq[t] || 0) + 1;
+    const total = tokens.length || 1;
+    const tf = {};
+    for (const t in freq) tf[t] = freq[t] / total;
+    return tf;
 }
 
 function tfidfCosineSim(text1, text2) {
-  const toks1 = tokenizeFiltered(text1);
-  const toks2 = tokenizeFiltered(text2);
-  if (!toks1.length || !toks2.length) return 0;
+    const toks1 = tokenizeFiltered(text1);
+    const toks2 = tokenizeFiltered(text2);
+    if (!toks1.length || !toks2.length) return 0;
 
-  const tf1 = buildTfVector(toks1);
-  const tf2 = buildTfVector(toks2);
+    const tf1 = buildTfVector(toks1);
+    const tf2 = buildTfVector(toks2);
 
-  // IDF: using both documents as the corpus
-  const allTerms = new Set([...Object.keys(tf1), ...Object.keys(tf2)]);
-  const idf = {};
-  for (const t of allTerms) {
-    const docCount = (tf1[t] ? 1 : 0) + (tf2[t] ? 1 : 0);
-    idf[t] = Math.log(3 / (1 + docCount)); // smoothed idf over 2-doc corpus
-  }
+    // IDF: using both documents as the corpus
+    const allTerms = new Set([...Object.keys(tf1), ...Object.keys(tf2)]);
+    const idf = {};
+    for (const t of allTerms) {
+        const docCount = (tf1[t] ? 1 : 0) + (tf2[t] ? 1 : 0);
+        idf[t] = Math.log(3 / (1 + docCount)); // smoothed idf over 2-doc corpus
+    }
 
-  // TF-IDF vectors
-  let dot = 0,
-    mag1 = 0,
-    mag2 = 0;
-  for (const t of allTerms) {
-    const v1 = (tf1[t] || 0) * idf[t];
-    const v2 = (tf2[t] || 0) * idf[t];
-    dot += v1 * v2;
-    mag1 += v1 * v1;
-    mag2 += v2 * v2;
-  }
-  if (!mag1 || !mag2) return 0;
-  return Math.max(0, Math.min(1, dot / (Math.sqrt(mag1) * Math.sqrt(mag2))));
+    // TF-IDF vectors
+    let dot = 0, mag1 = 0, mag2 = 0;
+    for (const t of allTerms) {
+        const v1 = (tf1[t] || 0) * idf[t];
+        const v2 = (tf2[t] || 0) * idf[t];
+        dot += v1 * v2;
+        mag1 += v1 * v1;
+        mag2 += v2 * v2;
+    }
+    if (!mag1 || !mag2) return 0;
+    return Math.max(0, Math.min(1, dot / (Math.sqrt(mag1) * Math.sqrt(mag2))));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -290,29 +144,26 @@ function tfidfCosineSim(text1, text2) {
 // ─────────────────────────────────────────────────────────────
 
 function tfCosineSim(text1, text2) {
-  const toks1 = tokenize(text1);
-  const toks2 = tokenize(text2);
-  if (!toks1.length || !toks2.length) return 0;
+    const toks1 = tokenize(text1);
+    const toks2 = tokenize(text2);
+    if (!toks1.length || !toks2.length) return 0;
 
-  // Raw term frequency (count) vectors
-  const tf1 = {},
-    tf2 = {};
-  for (const t of toks1) tf1[t] = (tf1[t] || 0) + 1;
-  for (const t of toks2) tf2[t] = (tf2[t] || 0) + 1;
+    // Raw term frequency (count) vectors
+    const tf1 = {}, tf2 = {};
+    for (const t of toks1) tf1[t] = (tf1[t] || 0) + 1;
+    for (const t of toks2) tf2[t] = (tf2[t] || 0) + 1;
 
-  const allTerms = new Set([...Object.keys(tf1), ...Object.keys(tf2)]);
-  let dot = 0,
-    mag1 = 0,
-    mag2 = 0;
-  for (const t of allTerms) {
-    const v1 = tf1[t] || 0;
-    const v2 = tf2[t] || 0;
-    dot += v1 * v2;
-    mag1 += v1 * v1;
-    mag2 += v2 * v2;
-  }
-  if (!mag1 || !mag2) return 0;
-  return Math.max(0, Math.min(1, dot / (Math.sqrt(mag1) * Math.sqrt(mag2))));
+    const allTerms = new Set([...Object.keys(tf1), ...Object.keys(tf2)]);
+    let dot = 0, mag1 = 0, mag2 = 0;
+    for (const t of allTerms) {
+        const v1 = tf1[t] || 0;
+        const v2 = tf2[t] || 0;
+        dot += v1 * v2;
+        mag1 += v1 * v1;
+        mag2 += v2 * v2;
+    }
+    if (!mag1 || !mag2) return 0;
+    return Math.max(0, Math.min(1, dot / (Math.sqrt(mag1) * Math.sqrt(mag2))));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -320,46 +171,43 @@ function tfCosineSim(text1, text2) {
 // ─────────────────────────────────────────────────────────────
 
 function ngramTokens(tokens, n) {
-  const result = [];
-  for (let i = 0; i <= tokens.length - n; i++) {
-    result.push(tokens.slice(i, i + n).join(" "));
-  }
-  return result;
+    const result = [];
+    for (let i = 0; i <= tokens.length - n; i++) {
+        result.push(tokens.slice(i, i + n).join(' '));
+    }
+    return result;
 }
 
 function extractAnchors(text, numAnchors = 5) {
-  if (!text || !text.trim()) return [];
-  const tokens = tokenizeFiltered(text);
-  const candidates = [
-    ...ngramTokens(tokens, 1),
-    ...ngramTokens(tokens, 2),
-    ...ngramTokens(tokens, 3),
-  ];
+    if (!text || !text.trim()) return [];
+    const tokens = tokenizeFiltered(text);
+    const candidates = [
+        ...ngramTokens(tokens, 1),
+        ...ngramTokens(tokens, 2),
+        ...ngramTokens(tokens, 3),
+    ];
 
-  // Score by TF (within text) — simple frequency heuristic like top-n keyphrases
-  const freq = {};
-  for (const c of candidates) freq[c] = (freq[c] || 0) + 1;
+    // Score by TF (within text) — simple frequency heuristic like top-n keyphrases
+    const freq = {};
+    for (const c of candidates) freq[c] = (freq[c] || 0) + 1;
 
-  // Prefer longer keyphrases (like KeyBERT's use_maxsum)
-  const scored = Object.entries(freq)
-    .map(([phrase, count]) => ({
-      phrase,
-      score: count * (1 + 0.3 * (phrase.split(" ").length - 1)),
-    }))
-    .sort((a, b) => b.score - a.score);
+    // Prefer longer keyphrases (like KeyBERT's use_maxsum)
+    const scored = Object.entries(freq)
+        .map(([phrase, count]) => ({ phrase, score: count * (1 + 0.3 * (phrase.split(' ').length - 1)) }))
+        .sort((a, b) => b.score - a.score);
 
-  // Deduplicate by removing phrases whose words are all contained in a higher-ranked phrase
-  const selected = [];
-  for (const { phrase } of scored) {
-    const words = new Set(phrase.split(" "));
-    const dominated = selected.some((s) => {
-      const sw = new Set(s.split(" "));
-      return [...words].every((w) => sw.has(w));
-    });
-    if (!dominated) selected.push(phrase);
-    if (selected.length >= numAnchors) break;
-  }
-  return selected;
+    // Deduplicate by removing phrases whose words are all contained in a higher-ranked phrase
+    const selected = [];
+    for (const { phrase } of scored) {
+        const words = new Set(phrase.split(' '));
+        const dominated = selected.some(s => {
+            const sw = new Set(s.split(' '));
+            return [...words].every(w => sw.has(w));
+        });
+        if (!dominated) selected.push(phrase);
+        if (selected.length >= numAnchors) break;
+    }
+    return selected;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -367,45 +215,35 @@ function extractAnchors(text, numAnchors = 5) {
 // ─────────────────────────────────────────────────────────────
 
 function computeFeatures(referenceAnswer, studentAnswer, numAnchors = 5) {
-  const anchors = extractAnchors(referenceAnswer, numAnchors);
-  if (!anchors.length || !studentAnswer.trim()) {
+    const anchors = extractAnchors(referenceAnswer, numAnchors);
+    if (!anchors.length || !studentAnswer.trim()) {
+        return {
+            feat_avg_semantic: 0, feat_max_semantic: 0,
+            feat_anchors_covered: 0, feat_avg_jaccard: 0, feat_avg_edit: 0,
+            anchors,
+        };
+    }
+
+    // Per-anchor scores — use plain TF cosine (tfCosineSim) so shared
+    // words between the student answer and anchor are correctly rewarded.
+    const COVERAGE_THRESHOLD = 0.35;
+
+    const semanticScores = anchors.map(a => tfCosineSim(studentAnswer, a));
+    const jaccardScores = anchors.map(a => jaccardSimilarity(studentAnswer, a));
+    const editScores = anchors.map(a => editSimilarity(studentAnswer, a));
+
+    const avg = arr => arr.reduce((s, v) => s + v, 0) / (arr.length || 1);
+    const max = arr => Math.max(...arr);
+
     return {
-      feat_avg_semantic: 0,
-      feat_max_semantic: 0,
-      feat_anchors_covered: 0,
-      feat_avg_jaccard: 0,
-      feat_avg_edit: 0,
-      anchors,
+        feat_avg_semantic: avg(semanticScores),
+        feat_max_semantic: max(semanticScores),
+        feat_anchors_covered: semanticScores.filter((s, i) => s >= COVERAGE_THRESHOLD || studentAnswer.toLowerCase().includes(anchors[i].toLowerCase())).length / anchors.length,
+        feat_avg_jaccard: avg(jaccardScores),
+        feat_avg_edit: avg(editScores),
+        anchors,
+        semanticScores, jaccardScores, editScores,
     };
-  }
-
-  // Per-anchor scores — use plain TF cosine (tfCosineSim) so shared
-  // words between the student answer and anchor are correctly rewarded.
-  const COVERAGE_THRESHOLD = 0.35;
-
-  const semanticScores = anchors.map((a) => tfCosineSim(studentAnswer, a));
-  const jaccardScores = anchors.map((a) => jaccardSimilarity(studentAnswer, a));
-  const editScores = anchors.map((a) => editSimilarity(studentAnswer, a));
-
-  const avg = (arr) => arr.reduce((s, v) => s + v, 0) / (arr.length || 1);
-  const max = (arr) => Math.max(...arr);
-
-  return {
-    feat_avg_semantic: avg(semanticScores),
-    feat_max_semantic: max(semanticScores),
-    feat_anchors_covered:
-      semanticScores.filter(
-        (s, i) =>
-          s >= COVERAGE_THRESHOLD ||
-          studentAnswer.toLowerCase().includes(anchors[i].toLowerCase()),
-      ).length / anchors.length,
-    feat_avg_jaccard: avg(jaccardScores),
-    feat_avg_edit: avg(editScores),
-    anchors,
-    semanticScores,
-    jaccardScores,
-    editScores,
-  };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -424,107 +262,20 @@ function computeFeatures(referenceAnswer, studentAnswer, numAnchors = 5) {
 
 // Common verbs / auxiliary verbs to exclude (approximate spaCy VERB filter)
 const COMMON_VERBS = new Set([
-  "use",
-  "used",
-  "uses",
-  "using",
-  "make",
-  "made",
-  "makes",
-  "making",
-  "get",
-  "gets",
-  "got",
-  "give",
-  "gives",
-  "gave",
-  "take",
-  "takes",
-  "took",
-  "come",
-  "goes",
-  "went",
-  "see",
-  "seen",
-  "look",
-  "looked",
-  "looks",
-  "know",
-  "knew",
-  "show",
-  "shows",
-  "shown",
-  "need",
-  "needs",
-  "want",
-  "let",
-  "like",
-  "help",
-  "call",
-  "called",
-  "keep",
-  "kept",
-  "put",
-  "seem",
-  "seems",
-  "felt",
-  "feel",
-  "tell",
-  "told",
-  "mean",
-  "means",
-  "provide",
-  "provides",
-  "include",
-  "includes",
-  "contain",
-  "contains",
-  "allow",
-  "allows",
-  "require",
-  "requires",
-  "become",
-  "becomes",
-  "refer",
-  "refers",
-  "result",
-  "results",
-  "occur",
-  "occurs",
-  "describe",
-  "describes",
-  "define",
-  "defines",
-  "explain",
-  "explains",
-  "involve",
-  "involves",
-  "perform",
-  "performs",
-  "produce",
-  "produces",
-  "increase",
-  "decrease",
-  "change",
-  "changes",
-  "lead",
-  "leads",
-  "work",
-  "works",
-  "move",
-  "moves",
-  "form",
-  "forms",
-  "pass",
-  "passes",
-  "start",
-  "starts",
-  "begin",
-  "begins",
-  "end",
-  "ends",
-  "cause",
-  "causes",
+    'use', 'used', 'uses', 'using', 'make', 'made', 'makes', 'making',
+    'get', 'gets', 'got', 'give', 'gives', 'gave', 'take', 'takes', 'took',
+    'come', 'goes', 'went', 'see', 'seen', 'look', 'looked', 'looks',
+    'know', 'knew', 'show', 'shows', 'shown', 'need', 'needs', 'want',
+    'let', 'like', 'help', 'call', 'called', 'keep', 'kept', 'put',
+    'seem', 'seems', 'felt', 'feel', 'tell', 'told', 'mean', 'means',
+    'provide', 'provides', 'include', 'includes', 'contain', 'contains',
+    'allow', 'allows', 'require', 'requires', 'become', 'becomes',
+    'refer', 'refers', 'result', 'results', 'occur', 'occurs',
+    'describe', 'describes', 'define', 'defines', 'explain', 'explains',
+    'involve', 'involves', 'perform', 'performs', 'produce', 'produces',
+    'increase', 'decrease', 'change', 'changes', 'lead', 'leads',
+    'work', 'works', 'move', 'moves', 'form', 'forms', 'pass', 'passes',
+    'start', 'starts', 'begin', 'begins', 'end', 'ends', 'cause', 'causes',
 ]);
 
 /**
@@ -539,62 +290,51 @@ const COMMON_VERBS = new Set([
  * Returns an array of unique technical term strings.
  */
 function extractTechnicalTerms(text) {
-  const tokens = tokenize(text); // lowercase, alphanumeric only
-  const seen = new Set();
-  const terms = [];
-  for (const t of tokens) {
-    if (t.length < 4) continue; // too short → likely not a technical noun
-    if (STOPWORDS.has(t)) continue; // function word
-    if (COMMON_VERBS.has(t)) continue; // auxiliary / linking verb
-    if (!seen.has(t)) {
-      seen.add(t);
-      terms.push(t);
+    const tokens = tokenize(text);  // lowercase, alphanumeric only
+    const seen = new Set();
+    const terms = [];
+    for (const t of tokens) {
+        if (t.length < 4) continue;             // too short → likely not a technical noun
+        if (STOPWORDS.has(t)) continue;         // function word
+        if (COMMON_VERBS.has(t)) continue;      // auxiliary / linking verb
+        if (!seen.has(t)) {
+            seen.add(t);
+            terms.push(t);
+        }
     }
-  }
-  return terms;
+    return terms;
 }
 
 function ruleBasedScore(referenceAnswer, studentAnswer, maxScore = 5) {
-  // Guard: empty answers get zero
-  if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
+    // Guard: empty answers get zero
+    if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
 
-  // ── Exact match → full marks ─────────────────────────────
-  const refNorm = referenceAnswer
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  const stuNorm = studentAnswer
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (refNorm === stuNorm) return maxScore;
+    // ── Exact match → full marks ─────────────────────────────
+    const refNorm = referenceAnswer.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const stuNorm = studentAnswer.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (refNorm === stuNorm) return maxScore;
 
-  // ── Technical term coverage (Colab approach) ─────────────
-  // Step 1: Extract unique technical terms from the reference
-  const refTerms = extractTechnicalTerms(referenceAnswer);
-  if (refTerms.length === 0) return 0;
+    // ── Technical term coverage (Colab approach) ─────────────
+    // Step 1: Extract unique technical terms from the reference
+    const refTerms = extractTechnicalTerms(referenceAnswer);
+    if (refTerms.length === 0) return 0;
 
-  // Step 2: All tokens of the student answer (for matching)
-  const stuAllTokens = new Set(tokenize(studentAnswer));
+    // Step 2: All tokens of the student answer (for matching)
+    const stuAllTokens = new Set(tokenize(studentAnswer));
 
-  // Step 3: Count how many reference technical terms appear in the student answer
-  const matchedTerms = refTerms.filter((t) => stuAllTokens.has(t));
-  const matchedCount = matchedTerms.length;
+    // Step 3: Count how many reference technical terms appear in the student answer
+    const matchedTerms = refTerms.filter(t => stuAllTokens.has(t));
+    const matchedCount = matchedTerms.length;
 
-  // Step 4: Term coverage ratio → score
-  const coverageRatio = matchedCount / refTerms.length; // 0–1
+    // Step 4: Term coverage ratio → score
+    const coverageRatio = matchedCount / refTerms.length;   // 0–1
 
-  // Store matched/total on object for explanation (accessible via closure in explanations)
-  ruleBasedScore._lastMatch = {
-    matched: matchedCount,
-    total: refTerms.length,
-    terms: matchedTerms,
-  };
+    // Store matched/total on object for explanation (accessible via closure in explanations)
+    ruleBasedScore._lastMatch = { matched: matchedCount, total: refTerms.length, terms: matchedTerms };
 
-  return coverageRatio * maxScore;
+    return coverageRatio * maxScore;
 }
+
 
 // ─────────────────────────────────────────────────────────────
 // 7B. STAGE 2 — PAPER'S GRADING METHOD  (PMC12171532)
@@ -609,10 +349,10 @@ function ruleBasedScore(referenceAnswer, studentAnswer, maxScore = 5) {
  *         by the student's answer's keywords."
  */
 function normalizedWordCount(referenceAnswer, studentAnswer) {
-  const refKw = tokenizeFiltered(referenceAnswer);
-  const stuKw = tokenizeFiltered(studentAnswer);
-  if (stuKw.length === 0) return 0;
-  return Math.min(1.0, refKw.length / stuKw.length);
+    const refKw = tokenizeFiltered(referenceAnswer);
+    const stuKw = tokenizeFiltered(studentAnswer);
+    if (stuKw.length === 0) return 0;
+    return Math.min(1.0, refKw.length / stuKw.length);
 }
 
 /**
@@ -629,41 +369,32 @@ function normalizedWordCount(referenceAnswer, studentAnswer) {
  *   M    = ceil(min(F · T, T))                                  ...(d)
  *
  * Returns F * maxScore (float) for additive combination with stage 1.
- *
- * CRITICAL FIX: Sc and Stf are now computed independently:
- * - Sc: TF cosine on ALL tokens (word-frequency vector similarity)
- * - Stf: TF-IDF cosine on FILTERED tokens (semantic similarity approximation)
- * This matches the paper's intention to use different semantic metrics.
+ * Note: Stf uses TF-IDF cosine as a surrogate for Universal Sentence Encoder.
  */
 function paperGradingScore(referenceAnswer, studentAnswer, maxScore = 5) {
-  if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
+    if (!referenceAnswer.trim() || !studentAnswer.trim()) return 0;
 
-  const Sj = jaccardSimilarity(referenceAnswer, studentAnswer); // wj = 0.15 (token set overlap)
-  const Se = editSimilarity(referenceAnswer, studentAnswer); // we = 0.05 (character-level similarity)
-  const Sc = tfCosineSim(referenceAnswer, studentAnswer); // wc = 0.15 (word-freq cosine on ALL tokens)
-  const Sw = normalizedWordCount(referenceAnswer, studentAnswer); // ww = 0.15 (content word ratio)
-  const Stf = tfidfCosineSim(referenceAnswer, studentAnswer); // wtf= 0.50 (semantic similarity via TF-IDF on filtered tokens)
+    const Sj = jaccardSimilarity(referenceAnswer, studentAnswer);    // wj = 0.15
+    const Se = editSimilarity(referenceAnswer, studentAnswer);        // we = 0.05
+    const Sc = tfCosineSim(referenceAnswer, studentAnswer);           // wc = 0.15  (word-freq cosine)
+    const Sw = normalizedWordCount(referenceAnswer, studentAnswer);   // ww = 0.15
+    const Stf = tfCosineSim(referenceAnswer, studentAnswer);           // wtf= 0.50  (USE proxy via TF cosine)
 
-  // Equation (a): Combined NLP base score
-  const Cnlp = Math.min(
-    1.0,
-    Math.max(0.0, 0.15 * Sj + 0.05 * Se + 0.15 * Sc + 0.15 * Sw),
-  );
+    // Equation (a): Combined NLP base score
+    const Cnlp = Math.min(1.0, Math.max(0.0, 0.15 * Sj + 0.05 * Se + 0.15 * Sc + 0.15 * Sw));
 
-  // Equation (b): Confidence score (blends semantic Stf with other NLP metrics)
-  const C = Math.min(1.0, Math.max(0.0, 0.5 * Stf + 0.5 * Cnlp));
+    // Equation (b): Confidence score
+    const C = Math.min(1.0, Math.max(0.0, 0.50 * Stf + 0.50 * Cnlp));
 
-  // Equation (c): Threshold rules
-  let F;
-  if (Stf < 0.2)
-    F = 0.0; // Low semantic similarity → fail
-  else if (Stf >= 0.9 && Sw >= 0.85)
-    F = 1.0; // Perfect semantic match AND high content → perfect score
-  else F = C; // Otherwise use blended confidence
+    // Equation (c): Threshold rules
+    let F;
+    if (Stf < 0.2) F = 0.0;
+    else if (Stf >= 0.9 && Sw >= 0.85) F = 1.0;
+    else F = C;
 
-  // Return F * maxScore (equation d uses ceil for integer marks;
-  // we return float so the additive logic can apply it smoothly)
-  return F * maxScore;
+    // Return F * maxScore (equation d uses ceil for integer marks;
+    // we return float so the additive logic can apply it smoothly)
+    return F * maxScore;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -672,10 +403,10 @@ function paperGradingScore(referenceAnswer, studentAnswer, maxScore = 5) {
 // ─────────────────────────────────────────────────────────────
 
 function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
-  const stage1 = ruleBasedScore(referenceAnswer, studentAnswer, maxScore);
-  const stage2 = paperGradingScore(referenceAnswer, studentAnswer, maxScore);
-  const final = Math.min(maxScore, stage1 + stage2);
-  return { stage1, stage2, final };
+    const stage1 = ruleBasedScore(referenceAnswer, studentAnswer, maxScore);
+    const stage2 = paperGradingScore(referenceAnswer, studentAnswer, maxScore);
+    const final = Math.min(maxScore, stage1 + stage2);
+    return { stage1, stage2, final };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -692,35 +423,24 @@ function predictScore(referenceAnswer, studentAnswer, features, maxScore = 5) {
 //   Jaccard              wj  = 0.15  → feat_avg_jaccard
 //   Edit Similarity      we  = 0.05  → feat_avg_edit
 const WEIGHTS = {
-  feat_avg_semantic: 0.5,
-  feat_max_semantic: 0.15,
-  feat_anchors_covered: 0.15,
-  feat_avg_jaccard: 0.15,
-  feat_avg_edit: 0.05,
+    feat_avg_semantic: 0.50,
+    feat_max_semantic: 0.15,
+    feat_anchors_covered: 0.15,
+    feat_avg_jaccard: 0.15,
+    feat_avg_edit: 0.05,
 };
 
-const BASELINE = 0.4;
+const BASELINE = 0.40;
 
 function shapValues(features, maxScore = 5) {
-  const scale = maxScore;
-  return {
-    feat_avg_semantic:
-      (features.feat_avg_semantic - BASELINE) *
-      WEIGHTS.feat_avg_semantic *
-      scale,
-    feat_max_semantic:
-      (features.feat_max_semantic - BASELINE) *
-      WEIGHTS.feat_max_semantic *
-      scale,
-    feat_anchors_covered:
-      (features.feat_anchors_covered - BASELINE) *
-      WEIGHTS.feat_anchors_covered *
-      scale,
-    feat_avg_jaccard:
-      (features.feat_avg_jaccard - BASELINE) * WEIGHTS.feat_avg_jaccard * scale,
-    feat_avg_edit:
-      (features.feat_avg_edit - BASELINE) * WEIGHTS.feat_avg_edit * scale,
-  };
+    const scale = maxScore;
+    return {
+        feat_avg_semantic: (features.feat_avg_semantic - BASELINE) * WEIGHTS.feat_avg_semantic * scale,
+        feat_max_semantic: (features.feat_max_semantic - BASELINE) * WEIGHTS.feat_max_semantic * scale,
+        feat_anchors_covered: (features.feat_anchors_covered - BASELINE) * WEIGHTS.feat_anchors_covered * scale,
+        feat_avg_jaccard: (features.feat_avg_jaccard - BASELINE) * WEIGHTS.feat_avg_jaccard * scale,
+        feat_avg_edit: (features.feat_avg_edit - BASELINE) * WEIGHTS.feat_avg_edit * scale,
+    };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -728,189 +448,141 @@ function shapValues(features, maxScore = 5) {
 // ─────────────────────────────────────────────────────────────
 
 function generateExplanation(scoreObj, features, shapVals, maxScore = 5) {
-  const score = scoreObj.final;
-  const {
-    feat_avg_semantic: avgSem,
-    feat_max_semantic: maxSem,
-    feat_anchors_covered: coverage,
-    feat_avg_jaccard: jaccard,
-    feat_avg_edit: editSim,
-  } = features;
+    const score = scoreObj.final;
+    const { feat_avg_semantic: avgSem, feat_max_semantic: maxSem,
+        feat_anchors_covered: coverage, feat_avg_jaccard: jaccard,
+        feat_avg_edit: editSim } = features;
 
-  const pct = score / maxScore;
-  const coveredPct = Math.round(coverage * 100);
-  const sections = [];
+    const pct = score / maxScore;
+    const coveredPct = Math.round(coverage * 100);
+    const sections = [];
 
-  // ── Overall verdict
-  let overall;
-  if (pct >= 0.85)
-    overall = `Your answer is excellent! You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>, placing you among the top performers.`;
-  else if (pct >= 0.65)
-    overall = `Your answer is good. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. You covered most of what was expected, with a little room to improve.`;
-  else if (pct >= 0.4)
-    overall = `Your answer is partially correct. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. You got some important points but missed several key ideas.`;
-  else
-    overall = `Your answer needs significant improvement. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. The answer is missing most of the core concepts expected.`;
-  sections.push({
-    icon: pct >= 0.65 ? "🎯" : pct >= 0.4 ? "📋" : "📉",
-    text: overall,
-  });
+    // ── Overall verdict
+    let overall;
+    if (pct >= 0.85)
+        overall = `Your answer is excellent! You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>, placing you among the top performers.`;
+    else if (pct >= 0.65)
+        overall = `Your answer is good. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. You covered most of what was expected, with a little room to improve.`;
+    else if (pct >= 0.40)
+        overall = `Your answer is partially correct. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. You got some important points but missed several key ideas.`;
+    else
+        overall = `Your answer needs significant improvement. You scored <strong>${score.toFixed(2)} out of ${maxScore.toFixed(1)}</strong>. The answer is missing most of the core concepts expected.`;
+    sections.push({ icon: pct >= 0.65 ? '🎯' : pct >= 0.40 ? '📋' : '📉', text: overall });
 
-  // ── Key concept coverage
-  let covText;
-  if (coveredPct >= 70)
-    covText = `You addressed approximately <strong>${coveredPct}%</strong> of the key concepts required in the ideal answer — this was a strong factor in your favour.`;
-  else if (coveredPct >= 40)
-    covText = `You addressed only about <strong>${coveredPct}%</strong> of the key concepts required. Missing the remaining concepts reduced your score (this factor ${shapVals.feat_anchors_covered > 0 ? "raised" : "lowered"} your mark).`;
-  else
-    covText = `You addressed very few (<strong>${coveredPct}%</strong>) of the key concepts expected in a complete answer. This was the biggest reason your score is low.`;
-  sections.push({
-    icon: coveredPct >= 70 ? "✅" : coveredPct >= 40 ? "⚠️" : "❌",
-    text: covText,
-  });
+    // ── Key concept coverage
+    let covText;
+    if (coveredPct >= 70)
+        covText = `You addressed approximately <strong>${coveredPct}%</strong> of the key concepts required in the ideal answer — this was a strong factor in your favour.`;
+    else if (coveredPct >= 40)
+        covText = `You addressed only about <strong>${coveredPct}%</strong> of the key concepts required. Missing the remaining concepts reduced your score (this factor ${shapVals.feat_anchors_covered > 0 ? 'raised' : 'lowered'} your mark).`;
+    else
+        covText = `You addressed very few (<strong>${coveredPct}%</strong>) of the key concepts expected in a complete answer. This was the biggest reason your score is low.`;
+    sections.push({ icon: coveredPct >= 70 ? '✅' : coveredPct >= 40 ? '⚠️' : '❌', text: covText });
 
-  // ── Semantic / meaning similarity
-  let semText;
-  if (avgSem >= 0.55)
-    semText = `The overall meaning of your answer closely matched the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). This shows you understood the topic well.`;
-  else if (avgSem >= 0.35)
-    semText = `The meaning of your answer partially matched the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). You understood some concepts but your explanation could be more precise.`;
-  else
-    semText = `The meaning of your answer was quite different from the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). The grader could not identify the core idea in your response.`;
-  sections.push({
-    icon: avgSem >= 0.55 ? "✅" : avgSem >= 0.35 ? "⚠️" : "❌",
-    text: semText,
-  });
+    // ── Semantic / meaning similarity
+    let semText;
+    if (avgSem >= 0.55)
+        semText = `The overall meaning of your answer closely matched the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). This shows you understood the topic well.`;
+    else if (avgSem >= 0.35)
+        semText = `The meaning of your answer partially matched the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). You understood some concepts but your explanation could be more precise.`;
+    else
+        semText = `The meaning of your answer was quite different from the expected answer (semantic similarity: <strong>${Math.round(avgSem * 100)}%</strong>). The grader could not identify the core idea in your response.`;
+    sections.push({ icon: avgSem >= 0.55 ? '✅' : avgSem >= 0.35 ? '⚠️' : '❌', text: semText });
 
-  // ── Best phrase match
-  let phraseText;
-  if (maxSem >= 0.65)
-    phraseText = `Your best phrase or sentence was a strong match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>).`;
-  else if (maxSem >= 0.45)
-    phraseText = `Your best phrase was a partial match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>). Try to be more specific.`;
-  else
-    phraseText = `Even your closest phrase had a low match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>) — try to use the correct terminology.`;
-  sections.push({ icon: "💬", text: phraseText, sub: true });
+    // ── Best phrase match
+    let phraseText;
+    if (maxSem >= 0.65)
+        phraseText = `Your best phrase or sentence was a strong match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>).`;
+    else if (maxSem >= 0.45)
+        phraseText = `Your best phrase was a partial match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>). Try to be more specific.`;
+    else
+        phraseText = `Even your closest phrase had a low match (peak similarity: <strong>${Math.round(maxSem * 100)}%</strong>) — try to use the correct terminology.`;
+    sections.push({ icon: '💬', text: phraseText, sub: true });
 
-  // ── Vocabulary / keyword overlap
-  let vocabText;
-  if (jaccard >= 0.3)
-    vocabText = `You used many of the same key words as the model answer (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>), which helped your score.`;
-  else if (jaccard >= 0.15)
-    vocabText = `You used some of the expected vocabulary (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>), but using more subject-specific terms would improve your mark.`;
-  else
-    vocabText = `Very few of the key words from the model answer appeared in your response (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>). Make sure to use the correct terminology.`;
-  sections.push({
-    icon: jaccard >= 0.3 ? "✅" : jaccard >= 0.15 ? "⚠️" : "❌",
-    text: vocabText,
-  });
+    // ── Vocabulary / keyword overlap
+    let vocabText;
+    if (jaccard >= 0.30)
+        vocabText = `You used many of the same key words as the model answer (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>), which helped your score.`;
+    else if (jaccard >= 0.15)
+        vocabText = `You used some of the expected vocabulary (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>), but using more subject-specific terms would improve your mark.`;
+    else
+        vocabText = `Very few of the key words from the model answer appeared in your response (word overlap: <strong>${Math.round(jaccard * 100)}%</strong>). Make sure to use the correct terminology.`;
+    sections.push({ icon: jaccard >= 0.30 ? '✅' : jaccard >= 0.15 ? '⚠️' : '❌', text: vocabText });
 
-  // ── Phrasing / edit distance
-  let phraseSim;
-  if (editSim >= 0.55)
-    phraseSim = `The way you phrased your answer was very similar to the expected answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>).`;
-  else if (editSim >= 0.3)
-    phraseSim = `Your phrasing was somewhat similar to the model answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>). Consider restructuring your sentences to be more concise and on-point.`;
-  else
-    phraseSim = `Your phrasing was quite different from the expected answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>). This may indicate you expressed ideas in an unrelated way or went off-topic.`;
-  sections.push({
-    icon: editSim >= 0.55 ? "✅" : editSim >= 0.3 ? "➡️" : "❌",
-    text: phraseSim,
-  });
+    // ── Phrasing / edit distance
+    let phraseSim;
+    if (editSim >= 0.55)
+        phraseSim = `The way you phrased your answer was very similar to the expected answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>).`;
+    else if (editSim >= 0.30)
+        phraseSim = `Your phrasing was somewhat similar to the model answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>). Consider restructuring your sentences to be more concise and on-point.`;
+    else
+        phraseSim = `Your phrasing was quite different from the expected answer (phrasing similarity: <strong>${Math.round(editSim * 100)}%</strong>). This may indicate you expressed ideas in an unrelated way or went off-topic.`;
+    sections.push({ icon: editSim >= 0.55 ? '✅' : editSim >= 0.30 ? '➡️' : '❌', text: phraseSim });
 
-  // ── How to improve
-  const tips = [];
-  if (coveredPct < 70)
-    tips.push(
-      "Re-read the question carefully and make sure you address ALL required points.",
-    );
-  if (avgSem < 0.5)
-    tips.push("Focus on expressing the core idea more clearly and directly.");
-  if (jaccard < 0.25)
-    tips.push(
-      "Use domain-specific vocabulary and keywords from your notes/textbook.",
-    );
-  if (editSim < 0.4)
-    tips.push(
-      "Write more structured, concise sentences that match the question's scope.",
-    );
+    // ── How to improve
+    const tips = [];
+    if (coveredPct < 70) tips.push('Re-read the question carefully and make sure you address ALL required points.');
+    if (avgSem < 0.50) tips.push('Focus on expressing the core idea more clearly and directly.');
+    if (jaccard < 0.25) tips.push('Use domain-specific vocabulary and keywords from your notes/textbook.');
+    if (editSim < 0.40) tips.push('Write more structured, concise sentences that match the question\'s scope.');
 
-  return { sections, tips };
+    return { sections, tips };
 }
 
 // ─────────────────────────────────────────────────────────────
 // 10. ExASAG SENTENCE-LEVEL ATTRIBUTIONS & CLUSTERS
 // ─────────────────────────────────────────────────────────────
 
-function calculateSentenceAttributions(
-  referenceAnswer,
-  studentAnswer,
-  maxScore,
-) {
-  // Split student answer into sentences safely
-  const sentences = studentAnswer
-    .replace(/([.?!])\s*(?=[A-Z])/g, "$1|")
-    .split("|")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-  if (sentences.length === 0) return [];
+function calculateSentenceAttributions(referenceAnswer, studentAnswer, maxScore) {
+    // Split student answer into sentences safely
+    const sentences = studentAnswer.replace(/([.?!])\s*(?=[A-Z])/g, "$1|").split("|").map(s => s.trim()).filter(s => s.length > 0);
+    if (sentences.length === 0) return [];
 
-  // Score the full answer first
-  const fullFeatures = computeFeatures(referenceAnswer, studentAnswer);
-  const fullScore = predictScore(
-    referenceAnswer,
-    studentAnswer,
-    fullFeatures,
-    maxScore,
-  ).final;
+    // Score the full answer first
+    const fullFeatures = computeFeatures(referenceAnswer, studentAnswer);
+    const fullScore = predictScore(referenceAnswer, studentAnswer, fullFeatures, maxScore).final;
 
-  return sentences.map((sentence) => {
-    // Score this individual sentence against the reference
-    const sentFeatures = computeFeatures(referenceAnswer, sentence);
-    const sentScoreObj = predictScore(
-      referenceAnswer,
-      sentence,
-      sentFeatures,
-      maxScore,
-    );
+    return sentences.map(sentence => {
+        // Score this individual sentence against the reference
+        const sentFeatures = computeFeatures(referenceAnswer, sentence);
+        const sentScoreObj = predictScore(referenceAnswer, sentence, sentFeatures, maxScore);
 
-    // Attribution is the difference relative to the average sentence contribution
-    // E.g., if a sentence scores higher than the total average density, it's a positive attribution
-    const diff = sentScoreObj.final - fullScore / Math.max(1, sentences.length);
+        // Attribution is the difference relative to the average sentence contribution
+        // E.g., if a sentence scores higher than the total average density, it's a positive attribution
+        const diff = sentScoreObj.final - (fullScore / Math.max(1, sentences.length));
 
-    return {
-      text: sentence,
-      score: sentScoreObj.final,
-      attribution: diff,
-    };
-  });
+        return {
+            text: sentence,
+            score: sentScoreObj.final,
+            attribution: diff
+        };
+    });
 }
 
 function calculateConceptClusters(referenceAnswer, studentAnswer, anchors) {
-  // Generate cluster bubbles: each anchor is a bubble.
-  // Size = importance (computed by word count/length proxy)
-  // Covered = does the student answer match this anchor > 0.35 similarity?
+    // Generate cluster bubbles: each anchor is a bubble.
+    // Size = importance (computed by word count/length proxy)
+    // Covered = does the student answer match this anchor > 0.35 similarity?
 
-  const coveredNodes = [];
-  for (const anchor of anchors) {
-    // Determine importance proxy based on length/words
-    const words = anchor.split(" ").length;
-    const importance = 20 + words * 10; // Base radius + growth
+    const coveredNodes = [];
+    for (const anchor of anchors) {
+        // Determine importance proxy based on length/words
+        const words = anchor.split(' ').length;
+        const importance = 20 + (words * 10); // Base radius + growth
 
-    // Determine if covered
-    const sim = tfCosineSim(studentAnswer, anchor);
-    const isCovered =
-      sim >= 0.35 || studentAnswer.toLowerCase().includes(anchor.toLowerCase());
+        // Determine if covered
+        const sim = tfCosineSim(studentAnswer, anchor);
+        const isCovered = sim >= 0.35 || studentAnswer.toLowerCase().includes(anchor.toLowerCase());
 
-    coveredNodes.push({
-      label: anchor,
-      radius: importance,
-      covered: isCovered,
-      similarity: sim,
-    });
-  }
+        coveredNodes.push({
+            label: anchor,
+            radius: importance,
+            covered: isCovered,
+            similarity: sim
+        });
+    }
 
-  return coveredNodes;
+    return coveredNodes;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -929,50 +601,21 @@ function calculateConceptClusters(referenceAnswer, studentAnswer, anchors) {
  *   clusters    = concept cluster coverage data
  */
 function gradeAnswer(referenceAnswer, studentAnswer, maxScore = 5) {
-  const features = computeFeatures(referenceAnswer, studentAnswer);
-  const scoreObj = predictScore(
-    referenceAnswer,
-    studentAnswer,
-    features,
-    maxScore,
-  );
-  const shap = shapValues(features, maxScore);
-  const explanation = generateExplanation(scoreObj, features, shap, maxScore);
+    const features = computeFeatures(referenceAnswer, studentAnswer);
+    const scoreObj = predictScore(referenceAnswer, studentAnswer, features, maxScore);
+    const shap = shapValues(features, maxScore);
+    const explanation = generateExplanation(scoreObj, features, shap, maxScore);
 
-  // 1. ExASAG Sentence-Level Attributions (SLA)
-  const sentences = calculateSentenceAttributions(
-    referenceAnswer,
-    studentAnswer,
-    maxScore,
-  );
+    // 1. ExASAG Sentence-Level Attributions (SLA)
+    const sentences = calculateSentenceAttributions(referenceAnswer, studentAnswer, maxScore);
 
-  // 2. Cluster visual data (Reference anchors vs Student matches)
-  const clusters = calculateConceptClusters(
-    referenceAnswer,
-    studentAnswer,
-    features.anchors,
-  );
+    // 2. Cluster visual data (Reference anchors vs Student matches)
+    const clusters = calculateConceptClusters(referenceAnswer, studentAnswer, features.anchors);
 
-  return {
-    scoreObj,
-    maxScore,
-    features,
-    shap,
-    explanation,
-    sentences,
-    clusters,
-  };
+    return { scoreObj, maxScore, features, shap, explanation, sentences, clusters };
 }
 
 // Export for use as module OR global (GitHub Pages = global)
-if (typeof module !== "undefined") {
-  module.exports = {
-    gradeAnswer,
-    ruleBasedScore,
-    paperGradingScore,
-    normalizedWordCount,
-    computeFeatures,
-    shapValues,
-    generateExplanation,
-  };
+if (typeof module !== 'undefined') {
+    module.exports = { gradeAnswer, ruleBasedScore, paperGradingScore, normalizedWordCount, computeFeatures, shapValues, generateExplanation };
 }

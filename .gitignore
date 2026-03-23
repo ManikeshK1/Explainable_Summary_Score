@@ -1,4 +1,4 @@
-﻿# Python Environments - DO NOT COMMIT
+﻿# Python Environments
 venv/
 spacy-env/
 env/
@@ -31,26 +31,29 @@ Thumbs.db
 *.swp
 *.swo
 
-# Large Binary Files - DO NOT COMMIT
+# Large Files
 *.dll
 *.so
+*.pyc
 *.pth
-*.whl
 torch_cpu.dll
 
-# Data/Output files - DO NOT COMMIT
+# Data/Output (not needed for website)
 *.xlsx
+*.csv
+*.docx
+*.pdf
+output.txt
 grading_results.csv
 Summary.xlsx
-*.docx
-output.txt
 
-# Colab notebooks - local development only
+# Private files
+.git/
+.gitignore
+
+# Colab - only needed for local development
 AI_chat.ipynb
 Agentic*
-"Agentic AI Class"*
 
-# Keep only essential files for website:
-# DO COMMIT: docs/, src/, README.md, package.json, requirements.txt, .gitignore
-# DO COMMIT: Python source files (semantic_mapping.py, anchor_extraction.py, etc.)
-# DO COMMIT: IMPLEMENTATION_SUMMARY.md
+# Python source files (use compiled versions in src/)
+# Only keep essential for website in docs/
