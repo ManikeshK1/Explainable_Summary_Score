@@ -26,8 +26,8 @@
       <li><a href="#pipeline">Pipeline</a></li>
       <li><a href="#demo">Live Demo</a></li>
       <li><a href="#batch">Batch Grade</a></li>
-      <li><a href="#demo">Live Demo</a></li>
       <li><a href="#script-eval">Script Eval</a></li>
+      <li><a href="#chat">Chat Assistant</a></li>
       <li><a href="#how-to-use">How to Use</a></li>
       <li><a href="#about">Research</a></li>
     </ul>
@@ -689,6 +689,46 @@ pip install -r requirements.txt</pre>
     </div>
   </section>
 
+  <!-- ═══ CHAT ASSISTANT ═══ -->
+  <section class="section chat-section" id="chat" style="background: rgba(108, 99, 255, 0.03); border-top: 1px solid var(--border-soft);">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Chat Assistant</span>
+        <h2>Ask Questions About Student Scores</h2>
+        <p>Get instant answers about student performance, statistics, and system explanations using natural language.</p>
+      </div>
+
+      <div class="chat-container appear">
+        <div class="chat-box">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-area">
+            <textarea 
+              id="chat-input" 
+              class="chat-input" 
+              placeholder="Ask me anything about student scores, statistics, or how the system works..."
+              rows="2"
+            ></textarea>
+            <button id="chat-send" class="btn btn--primary chat-button">
+              Send 💬
+            </button>
+          </div>
+        </div>
+
+        <div class="chat-suggestions appear">
+          <h4 style="margin-bottom: 12px; color: var(--text); font-size: 0.9rem;">💡 Try asking:</h4>
+          <div class="suggestions-grid">
+            <div class="suggestion-chip">Who has the highest score?</div>
+            <div class="suggestion-chip">How many students scored below 0.3?</div>
+            <div class="suggestion-chip">What's the average score?</div>
+            <div class="suggestion-chip">Score for John Doe?</div>
+            <div class="suggestion-chip">How does the system work?</div>
+            <div class="suggestion-chip">Show all students above 0.4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ═══ FOOTER ═══ -->
   <footer class="footer">
     <div class="container">
@@ -707,6 +747,7 @@ pip install -r requirements.txt</pre>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="scorer.js"></script>
+  <script src="chat.js"></script>
   <script src="app.js"></script>
 
 </body>
