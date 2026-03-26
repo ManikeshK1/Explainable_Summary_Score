@@ -308,20 +308,43 @@ def levenshtein_norm(a: str, b: str) -> float:
     return 1.0 - dist / max(la, lb)
 
 
-def tf_cosine(ref: str, stu: str) -> float:
-    """TF-vector cosine similarity between two texts."""
-    ref_words = re.findall(r"[a-z]{2,}", ref.lower())
-    stu_words = re.findall(r"[a-z]{2,}", stu.lower())
-    vocab = set(ref_words) | set(stu_words)
-    if not vocab:
-        return 0.0
-    vocab = list(vocab)
-    ref_tf = {w: ref_words.count(w) for w in vocab}
-    stu_tf = {w: stu_words.count(w) for w in vocab}
-    v1 = [ref_tf.get(w, 0) for w in vocab]
-    v2 = [stu_tf.get(w, 0) for w in vocab]
-    return cosine_similarity(v1, v2)
+# def tf_cosine(ref: str, stu: str) -> float:
+#     """TF-vector cosine similarity between two texts."""
+#     ref_words = re.findall(r"[a-z]{2,}", ref.lower())
+#     stu_words = re.findall(r"[a-z]{2,}", stu.lower())
+#     vocab = set(ref_words) | set(stu_words)
+#     if not vocab:
+#         return 0.0
+#     vocab = list(vocab)
+#     ref_tf = {w: ref_words.count(w) for w in vocab}
+#     stu_tf = {w: stu_words.count(w) for w in vocab}
+#     v1 = [ref_tf.get(w, 0) for w in vocab]
+#     v2 = [stu_tf.get(w, 0) for w in vocab]
+#     return cosine_similarity(v1, v2)
+# # C:\Users\deii\Desktop\cloud\local_grader.py
 
+def tf_cosine(ref: str, stu: str) -> float:
+    """
+    FIX: Removed math.log(3/(1+doc_count)) which was causing Zero-IDF.
+    Switched to raw Term Frequency Cosine Similarity.
+    """
+    import collections
+    import math
+    
+    toks1 = _all_tokens(ref)
+    toks2 = _all_tokens(stu)
+    if not toks1 or not toks2: return 0.0
+
+    tf1 = collections.Counter(toks1)
+    tf2 = collections.Counter(toks2)
+    all_terms = set(tf1) | set(tf2)
+
+    dot = sum(tf1.get(t, 0) * tf2.get(t, 0) for t in all_terms)
+    mag1 = math.sqrt(sum(v*v for v in tf1.values()))
+    mag2 = math.sqrt(sum(v*v for v in tf2.values()))
+
+    if mag1 == 0 or mag2 == 0: return 0.0
+    return dot / (mag1 * mag2)
 
 def normalized_word_count(ref: str, stu: str) -> float:
     ref_words = set(w for w in re.findall(r"[a-z]{3,}", ref.lower()) if w not in STOP_WORDS)

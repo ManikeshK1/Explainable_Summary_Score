@@ -1,669 +1,526 @@
 <!doctype html>
 <html lang="en" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ExplainGrade — Explainable Short Answer Grading System</title>
-    <meta
-      name="description"
-      content="An explainable automated short-answer grading system combining rule-based scoring, NLP similarity metrics, and sentence-level attribution feedback inspired by ExASAG (BEA 2023)."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>"
-    />
-  </head>
 
-  <body>
-    <!-- ═══ NAVBAR ═══ -->
-    <nav class="navbar" id="navbar">
-      <a class="navbar__logo" href="#">🔬 ExplainGrade</a>
-      <ul class="navbar__links">
-        <li><a href="#pipeline">Pipeline</a></li>
-        <li><a href="#demo">Live Demo</a></li>
-        <li><a href="#batch">Batch Grade</a></li>
-        <li><a href="#script-eval">Script Eval</a></li>
-        <li><a href="#chat">Chat Assistant</a></li>
-        <li><a href="#how-to-use">How to Use</a></li>
-        <li><a href="#about">Research</a></li>
-      </ul>
-      <div class="navbar__actions">
-        <a
-          class="btn btn--ghost btn--sm"
-          href="https://github.com/ManikeshK1/Explainable_Summary_Score"
-          target="_blank"
-          rel="noopener"
-          >⭐ GitHub</a
-        >
-        <button
-          class="theme-toggle"
-          id="theme-toggle"
-          title="Toggle dark / light mode"
-        >
-          ☀️
-        </button>
-      </div>
-    </nav>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExplainGrade — Explainable Short Answer Grading System</title>
+  <meta name="description"
+    content="An explainable automated short-answer grading system combining rule-based scoring, NLP similarity metrics, and sentence-level attribution feedback inspired by ExASAG (BEA 2023)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔬</text></svg>" />
+</head>
 
-    <!-- ═══ HERO ═══ -->
-    <section class="hero" id="hero">
-      <div class="hero__bg">
-        <div class="hero__grid"></div>
-      </div>
-      <div class="orb orb-1"></div>
-      <div class="orb orb-2"></div>
-      <div class="orb orb-3"></div>
+<body>
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar" id="navbar">
+    <a class="navbar__logo" href="#">🔬 ExplainGrade</a>
+    <ul class="navbar__links">
+      <li><a href="#pipeline">Pipeline</a></li>
+      <li><a href="#demo">Live Demo</a></li>
+      <li><a href="#batch">Batch Grade</a></li>
+      <li><a href="#script-eval">Script Eval</a></li>
+      <li><a href="#chat">Chat Assistant</a></li>
+      <li><a href="#how-to-use">How to Use</a></li>
+      <li><a href="#about">Research</a></li>
+    </ul>
+    <div class="navbar__actions">
+      <a class="btn btn--ghost btn--sm" href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank"
+        rel="noopener">⭐ GitHub</a>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle dark / light mode">
+        ☀️
+      </button>
+    </div>
+  </nav>
 
-      <div class="container">
-        <div class="hero__content">
-          <div class="hero__tag">
-            🎓 NLP Research · Explainable AI · Open Source
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero__bg">
+      <div class="hero__grid"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="container">
+      <div class="hero__content">
+        <div class="hero__tag">
+          🎓 NLP Research · Explainable AI · Open Source
+        </div>
+
+        <h1 class="hero__title">
+          Short Answer Grading<br />
+          <span class="grad">That Shows Its Work</span>
+        </h1>
+
+        <p class="hero__subtitle">
+          An automated grading system inspired by
+          <strong>ExASAG (BEA 2023)</strong> and <strong>PMC12171532</strong>.
+          Grades student answers using a two-stage pipeline — rule-based floor
+          + NLP similarity scoring — then explains <em>exactly</em> which
+          sentences and concepts drove the grade.
+        </p>
+
+        <div class="hero__cta">
+          <a href="#demo" class="btn btn--primary btn--lg">🚀 Try Live Demo</a>
+          <a href="#pipeline" class="btn btn--ghost btn--lg">How It Works</a>
+        </div>
+
+        <div class="hero__stats">
+          <div class="hero__stat">
+            <div class="hero__stat-value">2</div>
+            <div class="hero__stat-label">Scoring Stages</div>
           </div>
-
-          <h1 class="hero__title">
-            Short Answer Grading<br />
-            <span class="grad">That Shows Its Work</span>
-          </h1>
-
-          <p class="hero__subtitle">
-            An automated grading system inspired by
-            <strong>ExASAG (BEA 2023)</strong> and <strong>PMC12171532</strong>.
-            Grades student answers using a two-stage pipeline — rule-based floor
-            + NLP similarity scoring — then explains <em>exactly</em> which
-            sentences and concepts drove the grade.
-          </p>
-
-          <div class="hero__cta">
-            <a href="#demo" class="btn btn--primary btn--lg"
-              >🚀 Try Live Demo</a
-            >
-            <a href="#pipeline" class="btn btn--ghost btn--lg">How It Works</a>
+          <div class="hero__stat">
+            <div class="hero__stat-value">5</div>
+            <div class="hero__stat-label">NLP Metrics</div>
           </div>
-
-          <div class="hero__stats">
-            <div class="hero__stat">
-              <div class="hero__stat-value">2</div>
-              <div class="hero__stat-label">Scoring Stages</div>
-            </div>
-            <div class="hero__stat">
-              <div class="hero__stat-value">5</div>
-              <div class="hero__stat-label">NLP Metrics</div>
-            </div>
-            <div class="hero__stat">
-              <div class="hero__stat-value">2,200+</div>
-              <div class="hero__stat-label">Mohler Dataset Rows</div>
-            </div>
-            <div class="hero__stat">
-              <div class="hero__stat-value">100%</div>
-              <div class="hero__stat-label">Runs In Browser</div>
-            </div>
+          <div class="hero__stat">
+            <div class="hero__stat-value">2,200+</div>
+            <div class="hero__stat-label">Mohler Dataset Rows</div>
+          </div>
+          <div class="hero__stat">
+            <div class="hero__stat-value">100%</div>
+            <div class="hero__stat-label">Runs In Browser</div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══ PIPELINE ═══ -->
-    <section class="section" id="pipeline">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Architecture</span>
-          <h2>Two-Stage Grading Pipeline</h2>
+  <!-- ═══ PIPELINE ═══ -->
+  <section class="section" id="pipeline">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Architecture</span>
+        <h2>Two-Stage Grading Pipeline</h2>
+        <p>
+          Transparent by design — every point is traceable to a specific text
+          comparison.
+        </p>
+      </div>
+
+      <!-- Visual pipeline flow -->
+      <div class="pipeline appear">
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            ⚖️<span class="pipeline-step__num">1</span>
+          </div>
+          <h3>Stage 1: Rule-Based Floor</h3>
           <p>
-            Transparent by design — every point is traceable to a specific text
-            comparison.
+            Calculates a guaranteed minimum score based on literal technical term
+            coverage. Students cannot score below what they explicitly mentioned.
           </p>
+          <div class="pipeline-step__detail">Technical Term Match (Floor)</div>
         </div>
 
-        <!-- Visual pipeline flow -->
-        <div class="pipeline appear">
-          <div class="pipeline-step">
-            <div class="pipeline-step__icon">
-              ⚖️<span class="pipeline-step__num">1</span>
-            </div>
-            <h3>Rule-Based Floor</h3>
-            <p>
-              Counts what fraction of the reference's content words and key
-              bigrams appear in the student answer. This sets a guaranteed
-              minimum — students cannot score <em>below</em> what they literally
-              wrote.
-            </p>
-            <div class="pipeline-step__detail">Word Recall + Bigram Bonus</div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            📐<span class="pipeline-step__num">2</span>
           </div>
-
-          <div class="pipeline-arrow">→</div>
-
-          <div class="pipeline-step">
-            <div class="pipeline-step__icon">
-              📐<span class="pipeline-step__num">2</span>
-            </div>
-            <h3>NLP Similarity Grade</h3>
-            <p>
-              Four surface metrics (Jaccard, Edit, Cosine, Normalized Word
-              Count) combine into <strong>C<sub>nlp</sub></strong
-              >, then blended 50/50 with semantic similarity
-              <strong>S<sub>tf</sub></strong>
-              following the exact equations from Ahmad Ayaan & Ng (2024).
-            </p>
-            <div class="pipeline-step__detail">
-              C = 0.5·S<sub>tf</sub> + 0.5·C<sub>nlp</sub>
-            </div>
-          </div>
-
-          <div class="pipeline-arrow">→</div>
-
-          <div class="pipeline-step">
-            <div class="pipeline-step__icon">
-              💬<span class="pipeline-step__num">3</span>
-            </div>
-            <h3>Sentence Attribution</h3>
-            <p>
-              Inspired by <strong>ExASAG (BEA 2023)</strong> — each sentence in
-              the student's answer is scored independently. The system surfaces
-              which sentences were your strongest and which dragged your score
-              down.
-            </p>
-            <div class="pipeline-step__detail">
-              Sentence-Level Attributions (SLA)
-            </div>
-          </div>
-        </div>
-
-        <!-- Metric weight cards -->
-        <div class="section-title appear" style="margin-top: 64px">
-          <span class="badge">Metrics</span>
-          <h2>NLP Grading Metrics</h2>
+          <h3>Stage 2: Semantic Grading</h3>
           <p>
-            Exact weights from PMC12171532 — every number is from the published
-            paper.
+            Applies the PMC12171532 equations using NLP metrics and Semantic Similarity
+            to award points for meaning and conceptual understanding.
           </p>
+          <div class="pipeline-step__detail">NLP Metrics + Semantic Match</div>
         </div>
 
-        <div class="metrics-grid appear">
-          <div class="metric-card">
-            <div class="metric-card__symbol">S<sub>tf</sub></div>
-            <div class="metric-card__weight" style="color: #a78bfa">50%</div>
-            <div class="metric-card__name">Semantic Similarity</div>
-            <div class="metric-card__desc">
-              TF cosine similarity of full answer vectors — proxy for Universal
-              Sentence Encoder (USE) from the paper
-            </div>
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-step__icon">
+            🏆
           </div>
-          <div class="metric-card">
-            <div class="metric-card__symbol">S<sub>j</sub></div>
-            <div class="metric-card__weight" style="color: #38bdf8">15%</div>
-            <div class="metric-card__name">Jaccard Similarity</div>
-            <div class="metric-card__desc">
-              Token-set intersection over union — rewards correct vocabulary and
-              key terminology
-            </div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-card__symbol">S<sub>c</sub></div>
-            <div class="metric-card__weight" style="color: #34d399">15%</div>
-            <div class="metric-card__name">Cosine Similarity</div>
-            <div class="metric-card__desc">
-              Word-frequency vector cosine angle — captures phrasing and synonym
-              usage
-            </div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-card__symbol">S<sub>w</sub></div>
-            <div class="metric-card__weight" style="color: #fbbf24">15%</div>
-            <div class="metric-card__name">Normalized Word Count</div>
-            <div class="metric-card__desc">
-              ref keywords ÷ student keywords — penalises very short or
-              off-topic answers
-            </div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-card__symbol">S<sub>e</sub></div>
-            <div class="metric-card__weight" style="color: #f87171">5%</div>
-            <div class="metric-card__name">Edit Similarity</div>
-            <div class="metric-card__desc">
-              Normalized Levenshtein — catches typos and phrasing variations at
-              character level
-            </div>
+          <h3>Final Score</h3>
+          <p>
+            The system combines the floor and semantic scores, capping the result at
+            the maximum marks while generating explainable feedback.
+          </p>
+          <div class="pipeline-step__detail">Final Capped Result</div>
+        </div>
+      </div>
+      <!-- Metric weight cards -->
+      <div class="section-title appear" style="margin-top: 64px">
+        <span class="badge">Metrics</span>
+        <h2>NLP Grading Metrics</h2>
+        <p>
+          Exact weights from PMC12171532 — every number is from the published
+          paper.
+        </p>
+      </div>
+
+      <div class="metrics-grid appear">
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>tf</sub></div>
+          <div class="metric-card__weight" style="color: #a78bfa">50%</div>
+          <div class="metric-card__name">Semantic Similarity</div>
+          <div class="metric-card__desc">
+            TF cosine similarity of full answer vectors — proxy for Universal
+            Sentence Encoder (USE) from the paper
           </div>
         </div>
-
-        <!-- Scoring equations box -->
-        <div class="equation-box appear">
-          <div class="equation-box__title">
-            📋 Exact Scoring Equations (PMC12171532)
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>j</sub></div>
+          <div class="metric-card__weight" style="color: #38bdf8">15%</div>
+          <div class="metric-card__name">Jaccard Similarity</div>
+          <div class="metric-card__desc">
+            Token-set intersection over union — rewards correct vocabulary and
+            key terminology
           </div>
-          <div class="equation-box__body">
-            <div class="eq-row">
-              <span class="eq-label">(a) Base NLP Score</span>
-              <code
-                >C<sub>nlp</sub> = min(max(0, 0.15·S<sub>j</sub> + 0.05·S<sub
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>c</sub></div>
+          <div class="metric-card__weight" style="color: #34d399">15%</div>
+          <div class="metric-card__name">Cosine Similarity</div>
+          <div class="metric-card__desc">
+            Word-frequency vector cosine angle — captures phrasing and synonym
+            usage
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>w</sub></div>
+          <div class="metric-card__weight" style="color: #fbbf24">15%</div>
+          <div class="metric-card__name">Normalized Word Count</div>
+          <div class="metric-card__desc">
+            ref keywords ÷ student keywords — penalises very short or
+            off-topic answers
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__symbol">S<sub>e</sub></div>
+          <div class="metric-card__weight" style="color: #f87171">5%</div>
+          <div class="metric-card__name">Edit Similarity</div>
+          <div class="metric-card__desc">
+            Normalized Levenshtein — catches typos and phrasing variations at
+            character level
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring equations box -->
+      <div class="equation-box appear">
+        <div class="equation-box__title">
+          📋 Exact Scoring Equations (PMC12171532)
+        </div>
+        <div class="equation-box__body">
+          <div class="eq-row">
+            <span class="eq-label">(a) Base NLP Score</span>
+            <code>C<sub>nlp</sub> = min(max(0, 0.15·S<sub>j</sub> + 0.05·S<sub
                   >e</sub
                 >
-                + 0.15·S<sub>c</sub> + 0.15·S<sub>w</sub>), 1)</code
-              >
-            </div>
-            <div class="eq-row">
-              <span class="eq-label">(b) Confidence Score</span>
-              <code
-                >C = min(max(0, 0.5·S<sub>tf</sub> + 0.5·C<sub>nlp</sub>),
-                1)</code
-              >
-            </div>
-            <div class="eq-row">
-              <span class="eq-label">(c) Final Score Rule</span>
-              <code
-                >F = 0 if S<sub>tf</sub>&lt;0.2 &nbsp;|&nbsp; 1 if
+                + 0.15·S<sub>c</sub> + 0.15·S<sub>w</sub>), 1)</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(b) Confidence Score</span>
+            <code>C = min(max(0, 0.5·S<sub>tf</sub> + 0.5·C<sub>nlp</sub>),
+                1)</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(c) Final Score Rule</span>
+            <code>F = 0 if S<sub>tf</sub>&lt;0.2 &nbsp;|&nbsp; 1 if
                 S<sub>tf</sub>≥0.9 &amp; S<sub>w</sub>≥0.85 &nbsp;|&nbsp; C
-                otherwise</code
-              >
-            </div>
-            <div class="eq-row">
-              <span class="eq-label">(d) Stage 2 Score</span>
-              <code
-                >Stage2 = F × MaxMarks &nbsp;&nbsp; Final = min(MaxMarks, Stage1
-                + Stage2)</code
-              >
-            </div>
+                otherwise</code>
+          </div>
+          <div class="eq-row">
+            <span class="eq-label">(d) Stage 2 Score</span>
+            <code>Stage2 = F × MaxMarks &nbsp;&nbsp; Final = min(MaxMarks, Stage1 + Stage2)</code>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══ LIVE DEMO ═══ -->
-    <section class="section demo" id="demo">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Live Demo</span>
-          <h2>Grade Any Answer — Instantly</h2>
-          <p>
-            All computation runs in your browser. Zero data is sent to any
-            server.
-          </p>
-        </div>
+  <!-- ═══ LIVE DEMO ═══ -->
+  <section class="section demo" id="demo">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Live Demo</span>
+        <h2>Grade Any Answer — Instantly</h2>
+        <p>
+          All computation runs in your browser. Zero data is sent to any
+          server.
+        </p>
+      </div>
 
-        <div class="demo__layout">
-          <!-- Input Form -->
-          <div class="card appear" style="align-self: start">
-            <h3
-              style="
+      <div class="demo__layout">
+        <!-- Input Form -->
+        <div class="card appear" style="align-self: start">
+          <h3 style="
                 margin-bottom: 20px;
                 display: flex;
                 align-items: center;
                 gap: 10px;
-              "
-            >
-              ✍️ Enter Answers
-              <button
-                class="btn btn--ghost btn--sm"
-                id="try-sample"
-                style="margin-left: auto"
-              >
-                Try Sample
-              </button>
-            </h3>
+              ">
+            ✍️ Enter Answers
+            <button class="btn btn--ghost btn--sm" id="try-sample" style="margin-left: auto">
+              Try Sample
+            </button>
+          </h3>
 
-            <form id="demo-form">
+          <form id="demo-form">
+            <div class="form__group">
+              <label class="form__label" for="ref-answer">Reference / Ideal Answer</label>
+              <textarea class="form__textarea" id="ref-answer" rows="5"
+                placeholder="Paste the model answer or desired answer here…" required></textarea>
+            </div>
+
+            <div class="form__group">
+              <label class="form__label" for="stu-answer">Student Answer</label>
+              <textarea class="form__textarea" id="stu-answer" rows="5" placeholder="Paste the student's response here…"
+                required></textarea>
+            </div>
+
+            <div class="form__row">
               <div class="form__group">
-                <label class="form__label" for="ref-answer"
-                  >Reference / Ideal Answer</label
-                >
-                <textarea
-                  class="form__textarea"
-                  id="ref-answer"
-                  rows="5"
-                  placeholder="Paste the model answer or desired answer here…"
-                  required
-                ></textarea>
+                <label class="form__label" for="max-score">Max Score</label>
+                <input class="form__input" id="max-score" type="number" value="5" min="1" max="100" step="0.5" />
               </div>
+            </div>
 
-              <div class="form__group">
-                <label class="form__label" for="stu-answer"
-                  >Student Answer</label
-                >
-                <textarea
-                  class="form__textarea"
-                  id="stu-answer"
-                  rows="5"
-                  placeholder="Paste the student's response here…"
-                  required
-                ></textarea>
-              </div>
+            <button type="submit" class="btn btn--primary" style="width: 100%">
+              ⚡ Compute Score &amp; Explanation
+            </button>
+          </form>
+        </div>
 
-              <div class="form__row">
-                <div class="form__group">
-                  <label class="form__label" for="max-score">Max Score</label>
-                  <input
-                    class="form__input"
-                    id="max-score"
-                    type="number"
-                    value="5"
-                    min="1"
-                    max="100"
-                    step="0.5"
-                  />
-                </div>
-              </div>
+        <!-- Results Panel -->
+        <div>
+          <div class="spinner" id="spinner" style="margin: 60px auto"></div>
 
-              <button
-                type="submit"
-                class="btn btn--primary"
-                style="width: 100%"
-              >
-                ⚡ Compute Score &amp; Explanation
-              </button>
-            </form>
-          </div>
-
-          <!-- Results Panel -->
-          <div>
-            <div class="spinner" id="spinner" style="margin: 60px auto"></div>
-
-            <div class="result-panel" id="result-panel">
-              <!-- Score display -->
-              <div class="score-display" id="score-display">
-                <div
-                  style="
+          <div class="result-panel" id="result-panel">
+            <!-- Score display -->
+            <div class="score-display" id="score-display">
+              <div style="
                     display: flex;
                     align-items: baseline;
                     justify-content: center;
                     gap: 6px;
                     margin-bottom: 4px;
-                  "
-                >
-                  <span class="score-display__value" id="score-value">—</span>
-                  <span
-                    style="
+                  ">
+                <span class="score-display__value" id="score-value">—</span>
+                <span style="
                       font-size: 1.4rem;
                       color: var(--text-dim);
                       font-weight: 700;
-                    "
-                    id="score-max"
-                    >/ 5</span
-                  >
-                </div>
-                <div class="score-display__label">Predicted Score</div>
-                <div class="score-bar">
-                  <div class="score-bar__fill" id="score-bar-fill"></div>
-                </div>
-                <div id="stage-breakdown"></div>
+                    " id="score-max">/ 5</span>
               </div>
+              <div class="score-display__label">Predicted Score</div>
+              <div class="score-bar">
+                <div class="score-bar__fill" id="score-bar-fill"></div>
+              </div>
+              <div id="stage-breakdown"></div>
+            </div>
 
-              <!-- ── Cluster / Coverage Chart ── -->
-              <div
-                class="card appear"
-                style="margin-bottom: 16px"
-                id="cluster-card"
-              >
-                <div class="cluster-header">
-                  <span style="font-size: 1rem">🗺️</span>
-                  <h3>Concept Coverage Map</h3>
-                  <span class="part-badge">Visual · Key Concepts</span>
-                </div>
-                <div class="cluster-subtitle">
-                  Each bubble = one key concept extracted from the reference
-                  answer. <span style="color: #4ade80">Green</span> = covered in
-                  your answer, <span style="color: #f87171">Red</span> = missed.
-                  Size = concept importance (TF score).
-                </div>
-                <canvas
-                  id="cluster-canvas"
-                  width="520"
-                  height="220"
-                  style="
+            <!-- ── Cluster / Coverage Chart ── -->
+            <div class="card appear" style="margin-bottom: 16px" id="cluster-card">
+              <div class="cluster-header">
+                <span style="font-size: 1rem">🗺️</span>
+                <h3>Concept Coverage Map</h3>
+                <span class="part-badge">Visual · Key Concepts</span>
+              </div>
+              <div class="cluster-subtitle">
+                Each bubble = one key concept extracted from the reference
+                answer. <span style="color: #4ade80">Green</span> = covered in
+                your answer, <span style="color: #f87171">Red</span> = missed.
+                Size = concept importance (TF score).
+              </div>
+              <canvas id="cluster-canvas" width="520" height="220" style="
                     width: 100%;
                     max-width: 520px;
                     display: block;
                     margin: 12px auto 0;
-                  "
-                ></canvas>
-                <div
-                  id="cluster-legend"
-                  style="
+                  "></canvas>
+              <div id="cluster-legend" style="
                     display: flex;
                     gap: 18px;
                     justify-content: center;
                     margin-top: 10px;
                     font-size: 0.8rem;
                     color: var(--text-dim);
-                  "
-                ></div>
-              </div>
+                  "></div>
+            </div>
 
-              <!-- ── Sentence Attribution (ExASAG-style) ── -->
-              <div class="explanation-card appear">
-                <div class="explanation-card__header">
-                  <span style="font-size: 1.2rem">💬</span>
-                  <h3>Sentence-Level Attribution</h3>
-                  <span class="part-badge">ExASAG · BEA 2023</span>
-                </div>
-                <div class="exasag-info">
-                  Inspired by ExASAG (Filighera et al., BEA 2023) — each
-                  sentence in your answer is scored independently.
-                  <span style="color: #4ade80">■</span> Strong sentences pushed
-                  your score up. <span style="color: #f87171">■</span> Weak
-                  sentences pulled it down.
-                </div>
-                <div id="sentence-attribution-body"></div>
+            <!-- ── Sentence Attribution (ExASAG-style) ── -->
+            <div class="explanation-card appear">
+              <div class="explanation-card__header">
+                <span style="font-size: 1.2rem">💬</span>
+                <h3>Sentence-Level Attribution</h3>
+                <span class="part-badge">ExASAG · BEA 2023</span>
               </div>
-
-              <!-- ── Plain English Explanation ── -->
-              <div class="explanation-card appear">
-                <div class="explanation-card__header">
-                  <span style="font-size: 1.2rem">📝</span>
-                  <h3>What This Score Means</h3>
-                  <span class="part-badge">Part 1 · Plain English</span>
-                </div>
-                <div class="explanation-card__body" id="explanation-body"></div>
+              <div class="exasag-info">
+                Inspired by ExASAG (Filighera et al., BEA 2023) — each
+                sentence in your answer is scored independently.
+                <span style="color: #4ade80">■</span> Strong sentences pushed
+                your score up. <span style="color: #f87171">■</span> Weak
+                sentences pulled it down.
               </div>
+              <div id="sentence-attribution-body"></div>
+            </div>
 
-              <!-- ── SHAP Attribution bars ── -->
-              <div class="shap-card appear">
-                <div class="shap-card__header">
-                  <span style="font-size: 1.2rem">📊</span>
-                  <h3>Metric Attributions</h3>
-                  <span
-                    class="part-badge"
-                    style="
+            <!-- ── Plain English Explanation ── -->
+            <div class="explanation-card appear">
+              <div class="explanation-card__header">
+                <span style="font-size: 1.2rem">📝</span>
+                <h3>What This Score Means</h3>
+                <span class="part-badge">Part 1 · Plain English</span>
+              </div>
+              <div class="explanation-card__body" id="explanation-body"></div>
+            </div>
+
+            <!-- ── SHAP Attribution bars ── -->
+            <div class="shap-card appear">
+              <div class="shap-card__header">
+                <span style="font-size: 1.2rem">📊</span>
+                <h3>Metric Attributions</h3>
+                <span class="part-badge" style="
                       background: rgba(0, 212, 255, 0.1);
                       color: var(--accent2);
                       border-color: rgba(0, 212, 255, 0.2);
-                    "
-                  >
-                    Part 2 · Feature Impact
-                  </span>
-                </div>
-                <div class="shap-card__body" id="shap-body"></div>
-                <div
-                  style="
+                    ">
+                  Part 2 · Feature Impact
+                </span>
+              </div>
+              <div class="shap-card__body" id="shap-body"></div>
+              <div style="
                     padding: 12px 24px;
                     font-size: 0.78rem;
                     color: var(--text-dim);
                     border-top: 1px solid var(--border-soft);
-                  "
-                >
-                  ▲ Green bars = metric boosted your score above average
-                  &nbsp;·&nbsp; ▼ Red bars = metric pulled score below average.
-                  Hover for details.
-                </div>
+                  ">
+                ▲ Green bars = metric boosted your score above average
+                &nbsp;·&nbsp; ▼ Red bars = metric pulled score below average.
+                Hover for details.
               </div>
             </div>
-            <!-- /result-panel -->
           </div>
+          <!-- /result-panel -->
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══ BATCH GRADING (CSV) ═══ -->
-    <section class="section batch" id="batch" style="display: none">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Batch Mode</span>
-          <h2>Grade an Entire Class at Once</h2>
-          <p>
-            Upload a CSV — get scores for every row in seconds, entirely
-            in-browser.
-          </p>
-        </div>
+  <!-- ═══ BATCH GRADING (CSV) ═══ -->
+  <section class="section batch" id="batch">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Batch Mode</span>
+        <h2>Grade an Entire Class at Once</h2>
+        <p>
+          Upload a CSV — get scores for every row in seconds, entirely
+          in-browser.
+        </p>
+      </div>
 
-        <div class="csv-hint appear">
-          Required CSV columns (flexible name matching):
-          <code>question</code> &nbsp; <code>desired_answer</code> (or
-          <em>reference_answer / ideal_answer</em>) &nbsp;
-          <code>student_answer</code> (or <em>response</em>) — matches the
-          Mohler dataset format directly.
-        </div>
+      <div class="csv-hint appear">
+        Required CSV columns (flexible name matching):
+        <code>question</code> &nbsp; <code>desired_answer</code> (or
+        <em>reference_answer / ideal_answer</em>) &nbsp;
+        <code>student_answer</code> (or <em>response</em>) — matches the
+        Mohler dataset format directly.
+      </div>
 
-        <div class="upload-zone appear" id="upload-zone">
-          <div class="upload-zone__icon">📂</div>
-          <h3>Drop your CSV here, or click to browse</h3>
-          <p>Supports the Mohler dataset format out-of-the-box.</p>
-          <br />
-          <button
-            class="btn btn--primary btn--sm"
-            onclick="
+      <div class="upload-zone appear" id="upload-zone">
+        <div class="upload-zone__icon">📂</div>
+        <h3>Drop your CSV here, or click to browse</h3>
+        <p>Supports the Mohler dataset format out-of-the-box.</p>
+        <br />
+        <button class="btn btn--primary btn--sm" onclick="
               event.stopPropagation();
               document.getElementById('batch-file-input').click();
-            "
-          >
-            Choose File
-          </button>
-          <input type="file" id="batch-file-input" accept=".csv" />
-        </div>
-
-        <div
-          id="batch-progress"
-          class="hidden"
-          style="text-align: center; padding: 20px; color: var(--text-muted)"
-        ></div>
-        <div id="batch-results" class="hidden">
-          <div id="batch-table-wrap"></div>
-        </div>
+            ">
+          Choose File
+        </button>
+        <input type="file" id="batch-file-input" accept=".csv" />
       </div>
-    </section>
 
-    <!-- ═══ SCRIPT EVALUATION ═══ -->
-    <section class="section batch" id="script-eval">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Class Evaluation</span>
-          <h2>Evaluate Student Summaries vs Meet Transcript</h2>
-          <p>
-            Upload your Google Meet Transcript (.docx) and Student Summaries
-            (.xlsx). The system will automatically refine the transcript into a
-            reference answer and grade each student.
-          </p>
-        </div>
+      <div id="batch-progress" class="hidden" style="text-align: center; padding: 20px; color: var(--text-muted)"></div>
+      <div id="batch-results" class="hidden">
+        <div id="batch-table-wrap"></div>
+      </div>
+    </div>
+  </section>
 
-        <div class="grid-2 appear">
-          <div
-            class="upload-zone"
-            id="script-upload-zone"
-            style="min-height: 200px"
-          >
-            <div class="upload-zone__icon">📄</div>
-            <h3>1. Upload Teacher Script</h3>
-            <p>Provide the Google Meet transcript (.docx)</p>
-            <br />
-            <button
-              class="btn btn--ghost btn--sm"
-              onclick="
+  <!-- ═══ SCRIPT EVALUATION ═══ -->
+  <section class="section batch" id="script-eval">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Class Evaluation</span>
+        <h2>Evaluate Student Summaries vs Meet Transcript</h2>
+        <p>
+          Upload your Google Meet Transcript (.docx) and Student Summaries
+          (.xlsx). The system will automatically refine the transcript into a
+          reference answer and grade each student.
+        </p>
+      </div>
+
+      <div class="grid-2 appear">
+        <div class="upload-zone" id="script-upload-zone" style="min-height: 200px">
+          <div class="upload-zone__icon">📄</div>
+          <h3>1. Upload Teacher Script</h3>
+          <p>Provide the Google Meet transcript (.docx)</p>
+          <br />
+          <button class="btn btn--ghost btn--sm" onclick="
                 event.stopPropagation();
                 document.getElementById('script-file-input').click();
-              "
-            >
-              Choose .docx File
-            </button>
-            <input
-              type="file"
-              id="script-file-input"
-              accept=".docx"
-              style="display: none"
-            />
-            <div
-              id="script-file-name"
-              style="margin-top: 10px; font-size: 0.9rem; color: var(--primary)"
-            ></div>
-          </div>
+              ">
+            Choose .docx File
+          </button>
+          <input type="file" id="script-file-input" accept=".docx" style="display: none" />
+          <div id="script-file-name" style="margin-top: 10px; font-size: 0.9rem; color: var(--primary)"></div>
+        </div>
 
-          <div
-            class="upload-zone"
-            id="summary-upload-zone"
-            style="min-height: 200px"
-          >
-            <div class="upload-zone__icon">📊</div>
-            <h3>2. Upload Student Summaries</h3>
-            <p>Must contain columns: emailAddress, name, summary (.xlsx)</p>
-            <br />
-            <button
-              class="btn btn--ghost btn--sm"
-              onclick="
+        <div class="upload-zone" id="summary-upload-zone" style="min-height: 200px">
+          <div class="upload-zone__icon">📊</div>
+          <h3>2. Upload Student Summaries</h3>
+          <p>Must contain columns: emailAddress, name, summary (.xlsx)</p>
+          <br />
+          <button class="btn btn--ghost btn--sm" onclick="
                 event.stopPropagation();
                 document.getElementById('summary-file-input').click();
-              "
-            >
-              Choose .xlsx File
-            </button>
-            <input
-              type="file"
-              id="summary-file-input"
-              accept=".xlsx"
-              style="display: none"
-            />
-            <div
-              id="summary-file-name"
-              style="margin-top: 10px; font-size: 0.9rem; color: var(--primary)"
-            ></div>
-          </div>
-        </div>
-
-        <div class="appear" style="text-align: center; margin-top: 24px">
-          <button
-            id="run-script-eval-btn"
-            class="btn btn--primary btn--lg"
-            disabled
-          >
-            ⚡ Run Evaluation
+              ">
+            Choose .xlsx File
           </button>
+          <input type="file" id="summary-file-input" accept=".xlsx" style="display: none" />
+          <div id="summary-file-name" style="margin-top: 10px; font-size: 0.9rem; color: var(--primary)"></div>
         </div>
+      </div>
 
-        <div
-          id="script-eval-progress"
-          class="hidden"
-          style="text-align: center; padding: 20px; color: var(--text-muted)"
-        ></div>
-        <div id="script-eval-results" class="hidden">
-          <!-- Optional: Show the refined script text -->
-          <div class="card" style="margin-bottom: 24px">
-            <h4
-              style="
+      <div class="appear" style="text-align: center; margin-top: 24px">
+        <button id="run-script-eval-btn" class="btn btn--primary btn--lg" disabled>
+          ⚡ Run Evaluation
+        </button>
+      </div>
+
+      <div id="script-eval-progress" class="hidden" style="text-align: center; padding: 20px; color: var(--text-muted)">
+      </div>
+      <div id="script-eval-results" class="hidden">
+        <!-- Optional: Show the refined script text -->
+        <div class="card" style="margin-bottom: 24px">
+          <h4 style="
                 margin-bottom: 12px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-              "
-            >
-              <span>🧠 Refined Reference Answer (Auto-extracted)</span>
-              <button
-                class="btn btn--ghost btn--sm"
-                onclick="
+              ">
+            <span>🧠 Refined Reference Answer (Teacher Script Summary)</span>
+            <button class="btn btn--ghost btn--sm" onclick="
                   document
                     .getElementById('refined-script-content')
                     .classList.toggle('hidden')
-                "
-              >
-                Show/Hide
-              </button>
-            </h4>
-            <div
-              id="refined-script-content"
-              class="hidden"
-              style="
+                ">
+              Show/Hide
+            </button>
+          </h4>
+          <div id="refined-script-content" class="hidden" style="
                 font-size: 0.9rem;
                 line-height: 1.5;
                 color: var(--text-muted);
@@ -672,176 +529,154 @@
                 padding: 12px;
                 background: rgba(0, 0, 0, 0.2);
                 border-radius: 8px;
-              "
-            ></div>
-          </div>
-          <div id="script-table-wrap"></div>
+              "></div>
         </div>
+        <div id="script-table-wrap"></div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══ HOW TO USE ═══ -->
-    <section class="section" id="how-to-use">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Usage Guide</span>
-          <h2>Two Ways to Use ExplainGrade</h2>
-          <p>
-            Use the browser instantly, or run locally for heavier workloads and
-            better semantic accuracy.
-          </p>
-        </div>
+  <!-- ═══ HOW TO USE ═══ -->
+  <section class="section" id="how-to-use">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Usage Guide</span>
+        <h2>Two Ways to Use ExplainGrade</h2>
+        <p>
+          Use the browser instantly, or run locally for heavier workloads and
+          better semantic accuracy.
+        </p>
+      </div>
 
-        <div class="grid-2 appear">
-          <!-- Way 1: Website -->
-          <div class="card" style="border-top: 3px solid var(--primary)">
-            <div
-              style="
+      <div class="grid-2 appear">
+        <!-- Way 1: Website -->
+        <div class="card" style="border-top: 3px solid var(--primary)">
+          <div style="
                 display: flex;
                 align-items: center;
                 gap: 12px;
                 margin-bottom: 20px;
-              "
-            >
-              <span style="font-size: 2rem">🌐</span>
-              <div>
-                <h3 style="margin: 0">Option 1 — Use Directly in Browser</h3>
-                <p
-                  style="
+              ">
+            <span style="font-size: 2rem">🌐</span>
+            <div>
+              <h3 style="margin: 0">Option 1 — Use Directly in Browser</h3>
+              <p style="
                     margin: 4px 0 0;
                     color: var(--text-dim);
                     font-size: 0.88rem;
-                  "
-                >
-                  No install required. All computation runs in your browser.
-                </p>
-              </div>
-            </div>
-
-            <div class="how-to-steps">
-              <div class="how-to-step">
-                <span class="how-to-step__num">1</span>
-                <div>
-                  <strong>Single Answer Grading</strong><br />
-                  Go to
-                  <a href="#demo" style="color: var(--primary)">Live Demo</a> →
-                  paste a reference answer and student answer → click
-                  <em>Compute Score</em>.
-                </div>
-              </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">2</span>
-                <div>
-                  <strong>Batch CSV Grading</strong><br />
-                  Go to
-                  <a href="#batch" style="color: var(--primary)">Batch Grade</a>
-                  → upload a <code>.csv</code> with columns
-                  <code>question</code>, <code>desired_answer</code>,
-                  <code>student_answer</code> → results appear instantly.
-                </div>
-              </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">3</span>
-                <div>
-                  <strong>Class Evaluation (Script + Summaries)</strong><br />
-                  Go to
-                  <a href="#script-eval" style="color: var(--primary)"
-                    >Script Eval</a
-                  >
-                  → upload a Google Meet transcript <code>.docx</code> and
-                  student summaries <code>.xlsx</code> → click
-                  <em>Run Evaluation</em>.
-                </div>
-              </div>
-            </div>
-
-            <div class="how-to-note">
-              <span style="color: #4ade80">✅ Pros:</span> Zero setup, works on
-              any device with a browser, private (no data sent to server).<br />
-              <span style="color: #fbbf24">⚠ Limitation:</span> Uses TF-cosine
-              similarity (in-browser approximation). For best accuracy, use the
-              local runner.
+                  ">
+                No install required. All computation runs in your browser.
+              </p>
             </div>
           </div>
 
-          <!-- Way 2: Local -->
-          <div class="card" style="border-top: 3px solid #4ade80">
-            <div
-              style="
+          <div class="how-to-steps">
+            <div class="how-to-step">
+              <span class="how-to-step__num">1</span>
+              <div>
+                <strong>Single Answer Grading</strong><br />
+                Go to
+                <a href="#demo" style="color: var(--primary)">Live Demo</a> →
+                paste a reference answer and student answer → click
+                <em>Compute Score</em>.
+              </div>
+            </div>
+            <div class="how-to-step">
+              <span class="how-to-step__num">2</span>
+              <div>
+                <strong>Batch CSV Grading</strong><br />
+                Go to
+                <a href="#batch" style="color: var(--primary)">Batch Grade</a>
+                → upload a <code>.csv</code> with columns
+                <code>question</code>, <code>desired_answer</code>,
+                <code>student_answer</code> → results appear instantly.
+              </div>
+            </div>
+            <div class="how-to-step">
+              <span class="how-to-step__num">3</span>
+              <div>
+                <strong>Class Evaluation (Script + Summaries)</strong><br />
+                Go to
+                <a href="#script-eval" style="color: var(--primary)">Script Eval</a>
+                → upload a Google Meet transcript <code>.docx</code> and
+                student summaries <code>.xlsx</code> → click
+                <em>Run Evaluation</em>.
+              </div>
+            </div>
+          </div>
+
+          <div class="how-to-note">
+            <span style="color: #4ade80">✅ Pros:</span> Zero setup, works on
+            any device with a browser, private (no data sent to server).<br />
+            <span style="color: #fbbf24">⚠ Limitation:</span> Uses TF-cosine
+            similarity (in-browser approximation). For best accuracy, use the
+            local runner.
+          </div>
+        </div>
+
+        <!-- Way 2: Local -->
+        <div class="card" style="border-top: 3px solid #4ade80">
+          <div style="
                 display: flex;
                 align-items: center;
                 gap: 12px;
                 margin-bottom: 20px;
-              "
-            >
-              <span style="font-size: 2rem">🖥️</span>
-              <div>
-                <h3 style="margin: 0">
-                  Option 2 — Run Locally (Better Accuracy)
-                </h3>
-                <p
-                  style="
+              ">
+            <span style="font-size: 2rem">🖥️</span>
+            <div>
+              <h3 style="margin: 0">
+                Option 2 — Run Locally (Better Accuracy)
+              </h3>
+              <p style="
                     margin: 4px 0 0;
                     color: var(--text-dim);
                     font-size: 0.88rem;
-                  "
-                >
-                  Uses real sentence-transformers (all-MiniLM-L6-v2) for
-                  semantic similarity.
-                </p>
+                  ">
+                Uses real sentence-transformers (all-MiniLM-L6-v2) for
+                semantic similarity.
+              </p>
+            </div>
+          </div>
+
+          <div class="how-to-steps">
+            <div class="how-to-step">
+              <span class="how-to-step__num">1</span>
+              <div>
+                <strong>Prerequisites</strong><br />
+                Python 3.9+ installed.
+                <a href="https://www.python.org/downloads/" target="_blank" style="color: var(--primary)">Download
+                  Python →</a>
               </div>
             </div>
-
-            <div class="how-to-steps">
-              <div class="how-to-step">
-                <span class="how-to-step__num">1</span>
-                <div>
-                  <strong>Prerequisites</strong><br />
-                  Python 3.9+ installed.
-                  <a
-                    href="https://www.python.org/downloads/"
-                    target="_blank"
-                    style="color: var(--primary)"
-                    >Download Python →</a
-                  >
-                </div>
-              </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">2</span>
-                <div>
-                  <strong>Clone the repository</strong>
-                  <pre
-                    style="
+            <div class="how-to-step">
+              <span class="how-to-step__num">2</span>
+              <div>
+                <strong>Clone the repository</strong>
+                <pre style="
                       margin: 8px 0 0;
                       padding: 10px;
                       background: var(--bg-card);
                       border-radius: 6px;
                       font-size: 0.8rem;
                       overflow-x: auto;
-                    "
-                  >
+                    ">
 git clone https://github.com/ManikeshK1/Explainable_Summary_Score.git
-cd Explainable_Summary_Score</pre
-                  >
-                </div>
+cd Explainable_Summary_Score</pre>
               </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">3</span>
-                <div>
-                  <strong
-                    >Create a virtual environment &amp; install
-                    dependencies</strong
-                  >
-                  <pre
-                    style="
+            </div>
+            <div class="how-to-step">
+              <span class="how-to-step__num">3</span>
+              <div>
+                <strong>Create a virtual environment &amp; install
+                  dependencies</strong>
+                <pre style="
                       margin: 8px 0 0;
                       padding: 10px;
                       background: var(--bg-card);
                       border-radius: 6px;
                       font-size: 0.8rem;
                       overflow-x: auto;
-                    "
-                  >
+                    ">
 # Windows
 python -m venv venv
 venv\Scripts\activate
@@ -851,341 +686,299 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install all dependencies
-pip install -r requirements.txt</pre
-                  >
-                </div>
+pip install -r requirements.txt</pre>
               </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">4</span>
-                <div>
-                  <strong>Run the local grader</strong>
-                  <pre
-                    style="
+            </div>
+            <div class="how-to-step">
+              <span class="how-to-step__num">4</span>
+              <div>
+                <strong>Run the local grader</strong>
+                <pre style="
                       margin: 8px 0 0;
                       padding: 10px;
                       background: var(--bg-card);
                       border-radius: 6px;
                       font-size: 0.8rem;
                       overflow-x: auto;
-                    "
-                  >
+                    ">
 python local_grader.py \
   --docx "path/to/transcript.docx" \
   --xlsx "path/to/summaries.xlsx" \
-  --max-score 5</pre
-                  >
-                  Results are saved to <code>grading_results.csv</code> in the
-                  same folder.
-                </div>
-              </div>
-              <div class="how-to-step">
-                <span class="how-to-step__num">5</span>
-                <div>
-                  <strong>XLSX format expected</strong><br />
-                  Your summaries spreadsheet must have these columns (names are
-                  flexible):<br />
-                  <code>emailAddress</code> &nbsp;·&nbsp;
-                  <code>name</code> &nbsp;·&nbsp; <code>summary</code>
-                </div>
+  --max-score 5</pre>
+                Results are saved to <code>grading_results.csv</code> in the
+                same folder.
               </div>
             </div>
+            <div class="how-to-step">
+              <span class="how-to-step__num">5</span>
+              <div>
+                <strong>XLSX format expected</strong><br />
+                Your summaries spreadsheet must have these columns (names are
+                flexible):<br />
+                <code>emailAddress</code> &nbsp;·&nbsp;
+                <code>name</code> &nbsp;·&nbsp; <code>summary</code>
+              </div>
+            </div>
+          </div>
 
-            <div class="how-to-note">
-              <span style="color: #4ade80">✅ Pros:</span> Real
-              <strong>sentence-transformers</strong> semantic model, processes
-              hundreds of students fast, exports CSV automatically.<br />
-              <span style="color: #fbbf24">⚠ Note:</span> Requires internet on
-              first run to download the ~90 MB model (cached after that).
-            </div>
+          <div class="how-to-note">
+            <span style="color: #4ade80">✅ Pros:</span> Real
+            <strong>sentence-transformers</strong> semantic model, processes
+            hundreds of students fast, exports CSV automatically.<br />
+            <span style="color: #fbbf24">⚠ Note:</span> Requires internet on
+            first run to download the ~90 MB model (cached after that).
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ═══ RESEARCH / ABOUT ═══ -->
-    <section class="section about" id="about">
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Research</span>
-          <h2>The Research Behind ExplainGrade</h2>
-        </div>
-
-        <div class="grid-2">
-          <div class="card appear">
-            <h3 style="margin-bottom: 14px">🎓 Project Overview</h3>
-            <p style="margin-bottom: 12px">
-              <strong>ExplainGrade</strong> is an automated short-answer grading
-              (ASAG) system built on two published research works and the
-              <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark
-              of 2,273 student responses to Computer Science questions, graded
-              0–5 by human annotators.
-            </p>
-            <p style="margin-bottom: 12px">
-              The system addresses the twin problems present in ASAG:
-              <em>length-bias noise</em> (longer answers get artificially
-              inflated scores) and <em>black-box scoring</em> (students receive
-              no actionable feedback). By anchoring every grade to specific,
-              measurable NLP comparisons, every point is traceable.
-            </p>
-            <p>
-              The explanation layer is directly inspired by
-              <strong>ExASAG</strong> (Filighera et al., BEA 2023), which
-              introduces sentence-level attributions (SLA) — rating individual
-              sentences in the student's response for their contribution to the
-              final grade, giving students precise, actionable feedback.
-            </p>
-          </div>
-
-          <div class="card appear">
-            <h3 style="margin-bottom: 14px">📄 Key References</h3>
-            <div class="ref-list">
-              <div class="ref-item">
-                <div class="ref-num">1</div>
-                <div>
-                  <strong>Ahmad Ayaan &amp; Kok-Why Ng (2024)</strong><br />
-                  <em
-                    >Automated grading using natural language processing and
-                    semantic analysis.</em
-                  >
-                  PMC12171532. — Source of the NLP metric weights and scoring
-                  equations used in Stage 2.
-                </div>
-              </div>
-              <div class="ref-item">
-                <div class="ref-num">2</div>
-                <div>
-                  <strong>Filighera et al. (2023)</strong><br />
-                  <em
-                    >Our System for Short Answer Grading using Generative
-                    Models.</em
-                  >
-                  BEA Workshop, ACL 2023. — Source of the sentence-level
-                  attribution (SLA) explanation framework.
-                </div>
-              </div>
-              <div class="ref-item">
-                <div class="ref-num">3</div>
-                <div>
-                  <strong>Mohler et al. (2011)</strong><br />
-                  <em
-                    >Learning to grade short answer questions using semantic
-                    similarity measures and dependency graph alignments.</em
-                  >
-                  ACL. — Dataset used for training and evaluation.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card appear" style="grid-column: 1/-1">
-            <h3 style="margin-bottom: 14px">🛠 Tech Stack</h3>
-            <div class="tech-stack">
-              <span class="tech-tag">Python 3.12</span>
-              <span class="tech-tag">scikit-learn RF</span>
-              <span class="tech-tag">KeyBERT</span>
-              <span class="tech-tag">sentence-transformers</span>
-              <span class="tech-tag">all-MiniLM-L6-v2</span>
-              <span class="tech-tag">Levenshtein</span>
-              <span class="tech-tag">SHAP</span>
-              <span class="tech-tag">pandas / numpy</span>
-              <span class="tech-tag">TF Cosine Sim</span>
-              <span class="tech-tag">Jaccard Similarity</span>
-              <span class="tech-tag">HTML5 / CSS3</span>
-              <span class="tech-tag">Vanilla JS</span>
-              <span class="tech-tag">PapaParse</span>
-              <span class="tech-tag">Canvas API</span>
-              <span class="tech-tag">GitHub Pages</span>
-            </div>
-            <div class="divider"></div>
-            <h3 style="margin-bottom: 14px">📊 NLP Metric Reference</h3>
-            <div style="overflow-x: auto">
-              <table
-                style="
-                  width: 100%;
-                  border-collapse: collapse;
-                  font-size: 0.88rem;
-                "
-              >
-                <thead>
-                  <tr>
-                    <th class="tbl-th">Symbol</th>
-                    <th class="tbl-th">Metric</th>
-                    <th class="tbl-th">Weight</th>
-                    <th class="tbl-th">What It Measures</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="tbl-td">
-                      <code>S<sub>tf</sub></code>
-                    </td>
-                    <td class="tbl-td">Semantic Similarity</td>
-                    <td
-                      class="tbl-td"
-                      style="color: var(--primary); font-weight: 700"
-                    >
-                      50%
-                    </td>
-                    <td class="tbl-td" style="color: var(--text-muted)">
-                      TF cosine of full answer vectors — proxy for Universal
-                      Sentence Encoder contextual meaning
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="tbl-td">
-                      <code>S<sub>j</sub></code>
-                    </td>
-                    <td class="tbl-td">Jaccard Similarity</td>
-                    <td
-                      class="tbl-td"
-                      style="color: var(--primary); font-weight: 700"
-                    >
-                      15%
-                    </td>
-                    <td class="tbl-td" style="color: var(--text-muted)">
-                      Token-set intersection/union — rewards correct domain
-                      vocabulary and key terms
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="tbl-td">
-                      <code>S<sub>c</sub></code>
-                    </td>
-                    <td class="tbl-td">Cosine Similarity</td>
-                    <td
-                      class="tbl-td"
-                      style="color: var(--primary); font-weight: 700"
-                    >
-                      15%
-                    </td>
-                    <td class="tbl-td" style="color: var(--text-muted)">
-                      Word-frequency vector angle — captures synonym use and
-                      varied phrasing
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="tbl-td">
-                      <code>S<sub>w</sub></code>
-                    </td>
-                    <td class="tbl-td">Norm. Word Count</td>
-                    <td
-                      class="tbl-td"
-                      style="color: var(--primary); font-weight: 700"
-                    >
-                      15%
-                    </td>
-                    <td class="tbl-td" style="color: var(--text-muted)">
-                      ref keywords ÷ student keywords — prevents length
-                      inflation bias
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="tbl-td">
-                      <code>S<sub>e</sub></code>
-                    </td>
-                    <td class="tbl-td">Edit Similarity</td>
-                    <td
-                      class="tbl-td"
-                      style="color: var(--primary); font-weight: 700"
-                    >
-                      5%
-                    </td>
-                    <td class="tbl-td" style="color: var(--text-muted)">
-                      Normalised Levenshtein — character-level phrasing
-                      similarity for typo tolerance
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+  <!-- ═══ RESEARCH / ABOUT ═══ -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Research</span>
+        <h2>The Research Behind ExplainGrade</h2>
       </div>
-    </section>
 
-    <!-- ═══ CHAT ASSISTANT ═══ -->
-    <section
-      class="section chat-section"
-      id="chat"
-      style="
-        background: rgba(108, 99, 255, 0.03);
-        border-top: 1px solid var(--border-soft);
-      "
-    >
-      <div class="container">
-        <div class="section-title appear">
-          <span class="badge">Chat Assistant</span>
-          <h2>Ask Questions About Student Scores</h2>
+      <div class="grid-2">
+        <div class="card appear">
+          <h3 style="margin-bottom: 14px">🎓 Project Overview</h3>
+          <p style="margin-bottom: 12px">
+            <strong>ExplainGrade</strong> is an automated short-answer grading
+            (ASAG) system built on two published research works and the
+            <strong>Mohler Short Answer Grading Dataset</strong> — a benchmark
+            of 2,273 student responses to Computer Science questions, graded
+            0–5 by human annotators.
+          </p>
+          <p style="margin-bottom: 12px">
+            The system addresses the twin problems present in ASAG:
+            <em>length-bias noise</em> (longer answers get artificially
+            inflated scores) and <em>black-box scoring</em> (students receive
+            no actionable feedback). By anchoring every grade to specific,
+            measurable NLP comparisons, every point is traceable.
+          </p>
           <p>
-            Get instant answers about student performance, statistics, and
-            system explanations using natural language.
+            The explanation layer is directly inspired by
+            <strong>ExASAG</strong> (Filighera et al., BEA 2023), which
+            introduces sentence-level attributions (SLA) — rating individual
+            sentences in the student's response for their contribution to the
+            final grade, giving students precise, actionable feedback.
           </p>
         </div>
 
-        <div class="chat-container appear">
-          <div class="chat-box">
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-area">
-              <textarea
-                id="chat-input"
-                class="chat-input"
-                placeholder="Ask me anything about student scores, statistics, or how the system works..."
-                rows="2"
-              ></textarea>
-              <button id="chat-send" class="btn btn--primary chat-button">
-                Send 💬
-              </button>
-            </div>
-          </div>
-
-          <div class="chat-suggestions appear">
-            <h4
-              style="margin-bottom: 12px; color: var(--text); font-size: 0.9rem"
-            >
-              💡 Try asking:
-            </h4>
-            <div class="suggestions-grid">
-              <div class="suggestion-chip">Who has the highest score?</div>
-              <div class="suggestion-chip">
-                How many students scored below 0.3?
+        <div class="card appear">
+          <h3 style="margin-bottom: 14px">📄 Key References</h3>
+          <div class="ref-list">
+            <div class="ref-item">
+              <div class="ref-num">1</div>
+              <div>
+                <strong>Ahmad Ayaan &amp; Kok-Why Ng (2024)</strong><br />
+                <em>Automated grading using natural language processing and
+                  semantic analysis.</em>
+                PMC12171532. — Source of the NLP metric weights and scoring
+                equations used in Stage 2.
               </div>
-              <div class="suggestion-chip">What's the average score?</div>
-              <div class="suggestion-chip">Score for John Doe?</div>
-              <div class="suggestion-chip">How does the system work?</div>
-              <div class="suggestion-chip">Show all students above 0.4</div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-num">2</div>
+              <div>
+                <strong>Filighera et al. (2023)</strong><br />
+                <em>Our System for Short Answer Grading using Generative
+                  Models.</em>
+                BEA Workshop, ACL 2023. — Source of the sentence-level
+                attribution (SLA) explanation framework.
+              </div>
+            </div>
+            <div class="ref-item">
+              <div class="ref-num">3</div>
+              <div>
+                <strong>Mohler et al. (2011)</strong><br />
+                <em>Learning to grade short answer questions using semantic
+                  similarity measures and dependency graph alignments.</em>
+                ACL. — Dataset used for training and evaluation.
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ═══ FOOTER ═══ -->
-    <footer class="footer">
-      <div class="container">
+        <div class="card appear" style="grid-column: 1/-1">
+          <h3 style="margin-bottom: 14px">🛠 Tech Stack</h3>
+          <div class="tech-stack">
+            <span class="tech-tag">Python 3.12</span>
+            <span class="tech-tag">scikit-learn RF</span>
+            <span class="tech-tag">KeyBERT</span>
+            <span class="tech-tag">sentence-transformers</span>
+            <span class="tech-tag">all-MiniLM-L6-v2</span>
+            <span class="tech-tag">Levenshtein</span>
+            <span class="tech-tag">SHAP</span>
+            <span class="tech-tag">pandas / numpy</span>
+            <span class="tech-tag">TF Cosine Sim</span>
+            <span class="tech-tag">Jaccard Similarity</span>
+            <span class="tech-tag">HTML5 / CSS3</span>
+            <span class="tech-tag">Vanilla JS</span>
+            <span class="tech-tag">PapaParse</span>
+            <span class="tech-tag">Canvas API</span>
+            <span class="tech-tag">GitHub Pages</span>
+          </div>
+          <div class="divider"></div>
+          <h3 style="margin-bottom: 14px">📊 NLP Metric Reference</h3>
+          <div style="overflow-x: auto">
+            <table style="
+                  width: 100%;
+                  border-collapse: collapse;
+                  font-size: 0.88rem;
+                ">
+              <thead>
+                <tr>
+                  <th class="tbl-th">Symbol</th>
+                  <th class="tbl-th">Metric</th>
+                  <th class="tbl-th">Weight</th>
+                  <th class="tbl-th">What It Measures</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="tbl-td">
+                    <code>S<sub>tf</sub></code>
+                  </td>
+                  <td class="tbl-td">Semantic Similarity</td>
+                  <td class="tbl-td" style="color: var(--primary); font-weight: 700">
+                    50%
+                  </td>
+                  <td class="tbl-td" style="color: var(--text-muted)">
+                    TF cosine of full answer vectors — proxy for Universal
+                    Sentence Encoder contextual meaning
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tbl-td">
+                    <code>S<sub>j</sub></code>
+                  </td>
+                  <td class="tbl-td">Jaccard Similarity</td>
+                  <td class="tbl-td" style="color: var(--primary); font-weight: 700">
+                    15%
+                  </td>
+                  <td class="tbl-td" style="color: var(--text-muted)">
+                    Token-set intersection/union — rewards correct domain
+                    vocabulary and key terms
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tbl-td">
+                    <code>S<sub>c</sub></code>
+                  </td>
+                  <td class="tbl-td">Cosine Similarity</td>
+                  <td class="tbl-td" style="color: var(--primary); font-weight: 700">
+                    15%
+                  </td>
+                  <td class="tbl-td" style="color: var(--text-muted)">
+                    Word-frequency vector angle — captures synonym use and
+                    varied phrasing
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tbl-td">
+                    <code>S<sub>w</sub></code>
+                  </td>
+                  <td class="tbl-td">Norm. Word Count</td>
+                  <td class="tbl-td" style="color: var(--primary); font-weight: 700">
+                    15%
+                  </td>
+                  <td class="tbl-td" style="color: var(--text-muted)">
+                    ref keywords ÷ student keywords — prevents length
+                    inflation bias
+                  </td>
+                </tr>
+                <tr>
+                  <td class="tbl-td">
+                    <code>S<sub>e</sub></code>
+                  </td>
+                  <td class="tbl-td">Edit Similarity</td>
+                  <td class="tbl-td" style="color: var(--primary); font-weight: 700">
+                    5%
+                  </td>
+                  <td class="tbl-td" style="color: var(--text-muted)">
+                    Normalised Levenshtein — character-level phrasing
+                    similarity for typo tolerance
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CHAT ASSISTANT ═══ -->
+  <section class="section chat-section" id="chat" style="
+        background: rgba(108, 99, 255, 0.03);
+        border-top: 1px solid var(--border-soft);
+      ">
+    <div class="container">
+      <div class="section-title appear">
+        <span class="badge">Chat Assistant</span>
+        <h2>Ask Questions About Student Scores</h2>
         <p>
-          Built by
-          <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener"
-            >ManikeshK1</a
-          >
-          &nbsp;·&nbsp;
-          <a
-            href="https://github.com/ManikeshK1/Explainable_Summary_Score"
-            target="_blank"
-            rel="noopener"
-            >GitHub</a
-          >
-          &nbsp;·&nbsp; All scoring runs locally — no data leaves your browser.
+          Get instant answers about student performance, statistics, and
+          system explanations using natural language.
         </p>
       </div>
-    </footer>
 
-    <div class="toast" id="toast"></div>
+      <div class="chat-container appear">
+        <div class="chat-box">
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-area">
+            <textarea id="chat-input" class="chat-input"
+              placeholder="Ask me anything about student scores, statistics, or how the system works..."
+              rows="2"></textarea>
+            <button id="chat-send" class="btn btn--primary chat-button">
+              Send 💬
+            </button>
+          </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="scorer.js"></script>
-    <script src="chat.js"></script>
-    <script src="app.js"></script>
-  </body>
+        <div class="chat-suggestions appear">
+          <h4 style="margin-bottom: 12px; color: var(--text); font-size: 0.9rem">
+            💡 Try asking:
+          </h4>
+          <div class="suggestions-grid">
+            <div class="suggestion-chip">Who has the highest score?</div>
+            <div class="suggestion-chip">
+              How many students scored below 0.3?
+            </div>
+            <div class="suggestion-chip">What's the average score?</div>
+            <div class="suggestion-chip">Score for John Doe?</div>
+            <div class="suggestion-chip">How does the system work?</div>
+            <div class="suggestion-chip">Show all students above 0.4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        Built by
+        <a href="https://github.com/ManikeshK1" target="_blank" rel="noopener">ManikeshK1</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/ManikeshK1/Explainable_Summary_Score" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp; All scoring runs locally — no data leaves your browser.
+      </p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="scorer.js"></script>
+  <script src="chat.js"></script>
+  <script src="app.js"></script>
+</body>
+
 </html>

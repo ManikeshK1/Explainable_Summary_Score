@@ -6,3 +6,7 @@ openpyxl>=3.1.0
 pandas>=2.0.0
 sentence-transformers>=2.7.0
 torch>=2.0.0
+# python local_grader.py \
+#   --docx "path/to/transcript.docx" \
+#   --xlsx "path/to/summaries.xlsx" \
+#   --max-score 5

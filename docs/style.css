@@ -199,6 +199,7 @@ pre {
 }
 
 @media (max-width: 768px) {
+
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
@@ -431,21 +432,15 @@ pre {
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(
-      ellipse 80% 60% at 50% 0%,
+    radial-gradient(ellipse 80% 60% at 50% 0%,
       rgba(108, 99, 255, 0.18) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 50% 40% at 80% 60%,
+      transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 60%,
       rgba(0, 212, 255, 0.08) 0%,
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 40% 30% at 20% 80%,
+      transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%,
       rgba(255, 107, 157, 0.08) 0%,
-      transparent 70%
-    );
+      transparent 70%);
 }
 
 /* Animated grid lines */
@@ -498,12 +493,10 @@ pre {
 }
 
 .hero__title .grad {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--accent2) 50%,
-    var(--accent) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary) 0%,
+      var(--accent2) 50%,
+      var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -591,6 +584,7 @@ pre {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
@@ -768,7 +762,7 @@ pre {
   gap: 12px;
 }
 
-.form__row > * {
+.form__row>* {
   flex: 1;
 }
 
@@ -860,11 +854,9 @@ pre {
 }
 
 .explanation-card__header {
-  background: linear-gradient(
-    135deg,
-    rgba(108, 99, 255, 0.15),
-    rgba(0, 212, 255, 0.08)
-  );
+  background: linear-gradient(135deg,
+      rgba(108, 99, 255, 0.15),
+      rgba(0, 212, 255, 0.08));
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-soft);
   display: flex;
@@ -964,11 +956,9 @@ pre {
 }
 
 .shap-card__header {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 212, 255, 0.12),
-    rgba(108, 99, 255, 0.08)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 212, 255, 0.12),
+      rgba(108, 99, 255, 0.08));
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-soft);
   display: flex;
@@ -1339,11 +1329,9 @@ pre {
 .feature-card__icon {
   width: 52px;
   height: 52px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-glow),
-    rgba(0, 212, 255, 0.1)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-glow),
+      rgba(0, 212, 255, 0.1));
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   display: flex;
