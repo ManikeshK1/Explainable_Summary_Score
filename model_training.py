@@ -37,7 +37,7 @@ def train_and_save_model(df, model_save_path="asag_scoring_model.pkl", explainer
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     print(f"Training RandomForestRegressor on {len(X_train)} samples...")
-    model = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
+    model = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
     model.fit(X_train, y_train)
     
     # Evaluate
@@ -48,6 +48,9 @@ def train_and_save_model(df, model_save_path="asag_scoring_model.pkl", explainer
     
     print(f"Model MSE: {mse:.4f}")
     print(f"Model R2 Score: {r2:.4f}")
+    from scipy.stats import pearsonr
+    corr, _ = pearsonr(y_test, y_pred)
+    print(f"Model Pearson r: {corr:.4f}")
     
     # Initialize and save SHAP explainer for future inference explainability
     print("Initializing SHAP explainer...")
@@ -221,47 +224,29 @@ def _all_tokens(text):
 # ─────────────────────────────────────────────────────────────
 
 def rule_based_score(reference_answer: str, student_answer: str, max_score: float = 5.0) -> float:
-    """
-    Computes a floor score using direct word matching.
-
-    Logic:
-      1. Exact string match  → full marks immediately.
-      2. Otherwise: word-level recall = what % of the reference's content
-         words appear anywhere in the student answer.
-      3. Bigram bonus (+up to 15%): phrases like "carbon dioxide" match as units.
-
-    This score is the MINIMUM the student can receive. The AI stage can only add to it.
-    """
     if not reference_answer.strip() or not student_answer.strip():
         return 0.0
 
-    # ── Exact match → full marks ──────────────────────────────
+    # Normalization
     import re
     def normalise(t):
         return re.sub(r'\s+', ' ', re.sub(r'[^a-z0-9\s]', ' ', t.lower())).strip()
 
-    if normalise(reference_answer) == normalise(student_answer):
-        return max_score
-
-    # ── Word-level recall ─────────────────────────────────────
+    # Stage 1A: Content Word Recall (Unigrams)
     ref_words = list(dict.fromkeys(_content_tokens(reference_answer)))
-    if not ref_words:
-        return 0.0
-
+    if not ref_words: return 0.0
     stu_word_set = set(_all_tokens(student_answer))
-    matched_words = sum(1 for w in ref_words if w in stu_word_set)
-    word_recall = matched_words / len(ref_words)
+    word_recall = sum(1 for w in ref_words if w in stu_word_set) / len(ref_words)
 
-    # ── Bigram bonus ──────────────────────────────────────────
-    ref_content = list(dict.fromkeys(_content_tokens(reference_answer)))
+    # Stage 1B: Bigram Recall Bonus (+15% weights)
+    # Matching "neural network" is worth more than just "neural" and "network" separately
+    ref_content = _content_tokens(reference_answer)
     ref_bigrams = [f"{ref_content[i]} {ref_content[i+1]}" for i in range(len(ref_content)-1)]
-    stu_norm    = normalise(student_answer)
+    stu_norm = normalise(student_answer)
     bigram_hits = sum(1 for bg in ref_bigrams if bg in stu_norm) if ref_bigrams else 0
     bigram_bonus = (bigram_hits / len(ref_bigrams) * 0.15) if ref_bigrams else 0
 
-    rule_ratio = min(1.0, word_recall + bigram_bonus)
-    return rule_ratio * max_score
-
+    return min(1.0, word_recall + bigram_bonus) * max_score
 
 def tfidf_cosine_sim(text1: str, text2: str) -> float:
     """Computes TF-IDF Cosine Similarity between two texts.
@@ -468,26 +453,27 @@ def paper_grading_score(reference_answer: str, student_answer: str,
 
 def three_stage_predict(model, reference_answer, student_answer, feature_dict, max_score=5.0):
     """
-    FIX: Removed Stage 3. Stage 2 already includes Semantic Similarity (Stf).
-    Added a calibration multiplier (1.2x) to fix the 'too low' local scores.
+    Improved Two-Stage Pipeline with Human-Alignment Calibration.
     """
-    # Stage 1: Rule-based floor (Literal word match)
+    # 1. Calculate raw components
     stage1 = rule_based_score(reference_answer, student_answer, max_score)
+    stage2_raw = paper_grading_score(reference_answer, student_answer, max_score)
     
-    # Stage 2: Paper-based NLP + Semantic Grade
-    # Using _tf_cosine_sim instead of tfidf_cosine_sim to avoid Zero-IDF error
-    stage2 = paper_grading_score(reference_answer, student_answer, max_score)
+    # 2. CALIBRATION (The "Score Booster")
+    # We apply a slight non-linear boost to Stage 2. 
+    # This pushes scores in the 2-3 range slightly higher to match human averages.
+    ratio = stage2_raw / max_score
+    calibrated_stage2 = (ratio ** 0.75) * max_score # Power transform pushes low scores up
     
-    # CALIBRATION: Semantic models are mathematically 'stricter' than humans.
-    # We apply a slight boost to align with human 'feel'.
-    combined = stage1 + stage2
+    # 3. Aggregation
+    # Stage 1 acts as the floor, Stage 2 provides the "knowledge" points
+    combined = stage1 + (calibrated_stage2 * 0.6) # Weighted blend for better Pearson r
     
-    # Final Score: Capped at Max
     final = min(max_score, combined)
     
     return {
         'stage1_score': stage1,
-        'stage2_score': stage2,
+        'stage2_score': calibrated_stage2,
         'final_score':  final
     }
     
@@ -655,8 +641,8 @@ if __name__ == "__main__":
         df = load_dataset(file_path)
 
         # For demonstration, subset the data to speed things up
-        print("Using subset of 200 samples for demonstration...")
-        df_subset = df.head(200).copy()
+        print("Using subset of all samples for demonstration...")
+        df_subset = df.copy()
 
         # 2. Extract anchors & generate Semantic Mapping Features
         df_featured = build_feature_dataset(df_subset)

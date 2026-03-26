@@ -48,7 +48,9 @@ def train_and_save_model(df, model_save_path="asag_scoring_model.pkl", explainer
     
     print(f"Model MSE: {mse:.4f}")
     print(f"Model R2 Score: {r2:.4f}")
-    
+    from scipy.stats import pearsonr
+    corr, _ = pearsonr(y_test, y_pred)
+    print(f"Model Pearson r: {corr:.4f}")
     # Initialize and save SHAP explainer for future inference explainability
     print("Initializing SHAP explainer...")
     explainer = shap.TreeExplainer(model)
