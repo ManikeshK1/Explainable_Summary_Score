@@ -19,7 +19,7 @@ class ChatAssistant {
    */
   async loadData() {
     try {
-      const response = await fetch("../grading_results.csv");
+      const response = await fetch("./grading_results.csv");
       const csvText = await response.text();
       this.parseCSV(csvText);
       this.isLoaded = true;
@@ -209,7 +209,7 @@ The explanation you see after grading shows exactly which sentences helped or hu
    * Parse user query and generate response
    */
   processQuery(query) {
-    if (!this.isLoaded) {
+    if (!this.isLoaded || this.students.length === 0) {
       return "Loading student data... Please try again in a moment.";
     }
 
